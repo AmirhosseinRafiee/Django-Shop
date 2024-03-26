@@ -146,7 +146,28 @@
               </button>
               <!-- End Shopping Cart -->
 
+              {% if request.user.is_authenticated %}
+
+              <button class="btn btn-ghost-secondary btn-icon" id="dropdownMenuLink" data-bs-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                <span class="avatar avatar-sm avatar-circle">
+                  <img class="avatar-img" src="{% static 'img/160x160/img10.jpg' %}" alt="Image Description">
+                </span>
+              </button>
+
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <a class="dropdown-item" href="#">پروفایل</a>
+                <form action="{% url 'accounts:logout' %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item btn btn-link">خروج</button>
+                </form>
+              </div>
+
+              {% else %}
+
               <a class="btn btn-primary btn-transition" href="{% url 'accounts:login' %}">ورود</a>
+
+              {% endif %}
             </li>
           </ul>
         </div>
