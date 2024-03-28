@@ -46,15 +46,17 @@ class ProductModel(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = slugify(self.title, allow_unicode=True)
         try:
             super().save(*args, **kwargs)
         except IntegrityError:
             # Handle duplicate slug by modifying it
-            suffix = 1
+            suffix = 0
             while True:
                 try:
-                    self.slug = f"{slugify(self.title)}-{suffix}"
+                    self.slug = slugify(self.title, allow_unicode=True)
+                    if suffix > 0:
+                        self.slug += f'-{suffix}'
                     super().save(*args, **kwargs)
                     break
                 except IntegrityError:

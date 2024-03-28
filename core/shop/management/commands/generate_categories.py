@@ -8,7 +8,7 @@ class Command(BaseCommand):
     help = 'Generate fake data for ProductCategoryModel'
 
     def handle(self, *args, **kwargs):
-        fake = Faker()
+        fake = Faker(locale="fa_IR")
         for _ in range(10):
             title = fake.word()
             slug = slugify(title, allow_unicode=True)
