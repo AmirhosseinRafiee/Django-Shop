@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.sessions.models import Session
 from django.contrib.auth import get_user_model
 from .models import Profile
 
@@ -53,5 +54,12 @@ class ProfileAdmin(admin.ModelAdmin):
     search_fields = ("user", "phone_number", "last_name", "first_name")
     ordering = ("created_date",)
 
+class SessionAdmin(admin.ModelAdmin):
+    def _session_data(self, obj):
+        return obj.get_decoded()
+    list_display = ['session_key', '_session_data', 'expire_date']
+    readonly_fields = ['_session_data']
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Profile, ProfileAdmin)
+admin.site.register(Session, SessionAdmin)
