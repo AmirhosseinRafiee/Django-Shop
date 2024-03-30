@@ -2,6 +2,7 @@
 django >4.2,<4.3
 python-decouple
 pillow
+django-filter
 
 # develpment
 django-debug-toolbar
