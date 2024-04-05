@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load humanize %}
+{% load shop_tags %}
 
 {% block content %}
 <!-- Hero -->
@@ -15,7 +15,7 @@
               <!-- Slide -->
               <div class="swiper-slide">
                 <div class="card card-bordered shadow-none">
-                  <img class="card-img" src="{% static 'img/600x600/img1.jpg' %}" alt="Image Description">
+                  <img class="card-img" src="{{object.image.url}}" alt="Image Description">
                 </div>
               </div>
               <!-- End Slide -->
@@ -50,7 +50,7 @@
                 <!-- Slide -->
                 <div class="swiper-slide">
                   <a class="avatar avatar-circle" href="javascript:;">
-                    <img class="avatar-img" src="{% static 'img/160x160/img11.jpg' %}" alt="Image Description">
+                    <img class="avatar-img" src="{{object.image.url}}" alt="Image Description">
                   </a>
                 </div>
                 <!-- End Slide -->
@@ -103,10 +103,12 @@
         <span class="d-block mb-2">قیمت کل:</span>
         <div class="d-flex align-items-center">
           {% if object.is_discounted %}
-          <h3 class="mb-0">{{object.get_price|intcomma}} تومان</h3>
-          <span class="ms-2"><del>{{object.price|intcomma}} تومان</del></span>
+          <p class="card-text text-dark fs-4">
+            <span class="formatted-price">{{object.get_price}}</span>
+            <del><span class="text-body me-1 fs-6 formatted-price">{{object.price}}</span></del>
+          </p>
           {% else %}
-          <h3 class="mb-0">{{object.get_price|intcomma}} تومان</h3>
+          <p class="card-text text-dark fs-4 formatted-price"> {{object.price}}</p>
           {% endif %}
         </div>
       </div>
@@ -302,7 +304,7 @@
 
     <div class="col-md-6">
       <div class="bg-img-center h-100 rounded-2"
-        style="background-image: url({% static 'img/750x750/img3.jpg); min-height: 30rem;"></div>
+        style="background-image: url({% static 'img/750x750/img3.jpg' %}); min-height: 30rem;"></div>
     </div>
   </div>
 
@@ -316,203 +318,14 @@
 
     <div class="col-md-6 order-md-1">
       <div class="bg-img-center h-100 rounded-2"
-        style="background-image: url({% static 'img/750x750/img4.jpg); min-height: 30rem;"></div>
+        style="background-image: url({% static 'img/750x750/img4.jpg' %}); min-height: 30rem;"></div>
     </div>
   </div>
 </div>
 <!-- End Content -->
 
 <!-- Card Grid -->
-<div class="container content-space-2 content-space-lg-3">
-  <!-- Title -->
-  <div class="w-md-75 w-lg-50 text-center mx-md-auto mb-5 mb-md-9">
-    <h2>فقط برای شما</h2>
-  </div>
-  <!-- End Title -->
-
-  <div class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
-    <div class="col mb-4">
-      <!-- Card -->
-      <div class="card card-bordered shadow-none text-center h-100">
-        <div class="card-pinned">
-          <img class="card-img-top" src="{% static 'img/300x180/img3.jpg' %}" alt="Image Description">
-
-          <div class="card-pinned-top-start">
-            <span class="badge bg-success rounded-pill">جدید</span>
-          </div>
-
-          <div class="card-pinned-top-end">
-            <button type="button" class="btn btn-outline-secondary btn-xs btn-icon rounded-circle"
-              data-bs-toggle="tooltip" data-bs-placement="top" title="افزودن به علایق">
-              <i class="bi-heart"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="card-body">
-          <div class="mb-1">
-            <a class="link-sm link-secondary" href="#">تجهیزات جانبی</a>
-          </div>
-          <a class="text-body" href="/product-overview.html">کوله پشتی هرشل به رنگ آبی تیره</a>
-          <p class="card-text text-dark">$56.99</p>
-        </div>
-
-        <div class="card-footer pt-0">
-          <!-- Rating -->
-          <a class="d-inline-flex align-items-center mb-3" href="#">
-            <div class="d-flex gap-1 ms-2">
-              <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
-            </div>
-            <span class="small">0</span>
-          </a>
-          <!-- End Rating -->
-
-          <button type="button" class="btn btn-outline-primary btn-sm rounded-pill">افزودن به سبد خرید</button>
-        </div>
-      </div>
-      <!-- End Card -->
-    </div>
-    <!-- End Col -->
-
-    <div class="col mb-4">
-      <!-- Card -->
-      <div class="card card-bordered shadow-none text-center h-100">
-        <div class="card-pinned">
-          <img class="card-img-top" src="{% static 'img/300x180/img1.jpg' %}" alt="Image Description">
-
-          <div class="card-pinned-top-end">
-            <button type="button" class="btn btn-outline-secondary btn-xs btn-icon rounded-circle"
-              data-bs-toggle="tooltip" data-bs-placement="top" title="افزودن به علایق">
-              <i class="bi-heart"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="card-body">
-          <div class="mb-1">
-            <a class="link-sm link-secondary" href="#">تن پوش</a>
-          </div>
-          <a class="text-body" href="/product-overview.html">Front hoodie</a>
-          <p class="card-text text-dark">$91.88</p>
-        </div>
-
-        <div class="card-footer pt-0">
-          <!-- Rating -->
-          <a class="d-inline-flex align-items-center mb-3" href="#">
-            <div class="d-flex gap-1 ms-2">
-              <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
-            </div>
-            <span class="small">40</span>
-          </a>
-          <!-- End Rating -->
-
-          <button type="button" class="btn btn-outline-primary btn-sm rounded-pill">Add to cart</button>
-        </div>
-      </div>
-      <!-- End Card -->
-    </div>
-    <!-- End Col -->
-
-    <div class="col mb-4">
-      <!-- Card -->
-      <div class="card card-bordered shadow-none text-center h-100">
-        <div class="card-pinned">
-          <img class="card-img-top" src="{% static 'img/300x180/img4.jpg' %}" alt="Image Description">
-
-          <div class="card-pinned-top-start">
-            <span class="badge bg-danger rounded-pill">اتمام موجودی</span>
-          </div>
-
-          <div class="card-pinned-top-end">
-            <button type="button" class="btn btn-outline-secondary btn-xs btn-icon rounded-circle"
-              data-bs-toggle="tooltip" data-bs-placement="top" title="افزودن به علایق">
-              <i class="bi-heart"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="card-body">
-          <div class="mb-1">
-            <a class="link-sm link-secondary" href="#">تجهیزات جانبی</a>
-          </div>
-          <a class="text-body" href="/product-overview.html">کوله پشتی هرشل به رنگ خاکستری</a>
-          <p class="card-text text-dark">$29.99 <span class="text-body ms-1"><del>$33.99</del></span></p>
-        </div>
-
-        <div class="card-footer pt-0">
-          <!-- Rating -->
-          <a class="d-inline-flex align-items-center mb-3" href="#">
-            <div class="d-flex gap-1 ms-2">
-              <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
-            </div>
-            <span class="small">125</span>
-          </a>
-          <!-- End Rating -->
-
-          <button type="button" class="btn btn-outline-primary btn-sm rounded-pill">افزودن به سبد خرید</button>
-        </div>
-      </div>
-      <!-- End Card -->
-    </div>
-    <!-- End Col -->
-
-    <div class="col mb-4">
-      <!-- Card -->
-      <div class="card card-bordered shadow-none text-center h-100">
-        <div class="card-pinned">
-          <img class="card-img-top" src="{% static 'img/300x180/img6.jpg' %}" alt="Image Description">
-
-          <div class="card-pinned-top-end">
-            <button type="button" class="btn btn-outline-secondary btn-xs btn-icon rounded-circle"
-              data-bs-toggle="tooltip" data-bs-placement="top" title="افزودن به علایق">
-              <i class="bi-heart"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="card-body">
-          <div class="mb-1">
-            <a class="link-sm link-secondary" href="#">تن پوش</a>
-          </div>
-          <a class="text-body" href="/product-overview.html">تیشرت آدیکالر جلوی اورجینال با لوگوی سه تایی</a>
-          <p class="card-text text-dark">$38.00</p>
-        </div>
-
-        <div class="card-footer pt-0">
-          <!-- Rating -->
-          <a class="d-inline-flex align-items-center mb-3" href="#">
-            <div class="d-flex gap-1 ms-2">
-              <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-              <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-            </div>
-            <span class="small">9</span>
-          </a>
-          <!-- End Rating -->
-
-          <button type="button" class="btn btn-outline-primary btn-sm rounded-pill">افزودن به سبد خرید</button>
-        </div>
-      </div>
-      <!-- End Card -->
-    </div>
-    <!-- End Col -->
-  </div>
-  <!-- End Row -->
-</div>
+{% similar_products object %}
 <!-- End Card Grid -->
 
 <!-- Review Section -->
@@ -707,7 +520,8 @@
             <!-- Media -->
             <div class="d-flex align-items-center mb-3">
               <div class="flex-shrink-0">
-                <img class="avatar avatar-sm avatar-circle" src="{% static 'img/160x160/img9.jpg' %}" alt="Image Description">
+                <img class="avatar avatar-sm avatar-circle" src="{% static 'img/160x160/img9.jpg' %}"
+                  alt="Image Description">
               </div>
 
               <div class="flex-grow-1 ms-3">
@@ -760,7 +574,8 @@
             <!-- Media -->
             <div class="d-flex align-items-center mb-3">
               <div class="flex-shrink-0">
-                <img class="avatar avatar-sm avatar-circle" src="{% static 'img/160x160/img1.jpg' %}" alt="Image Description">
+                <img class="avatar avatar-sm avatar-circle" src="{% static 'img/160x160/img1.jpg' %}"
+                  alt="Image Description">
               </div>
 
               <div class="flex-grow-1 ms-3">
@@ -811,7 +626,8 @@
             <!-- Media -->
             <div class="d-flex align-items-center mb-3">
               <div class="flex-shrink-0">
-                <img class="avatar avatar-sm avatar-circle" src="{% static 'img/160x160/img8.jpg' %}" alt="Image Description">
+                <img class="avatar avatar-sm avatar-circle" src="{% static 'img/160x160/img8.jpg' %}"
+                  alt="Image Description">
               </div>
 
               <div class="flex-grow-1 ms-3">

@@ -1,5 +1,4 @@
 {% load static %}
-{% load humanize %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
@@ -57,19 +56,23 @@
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link active" href="{% url 'website:index' %}">صفحه اصلی</a>
+              <a class="nav-link {% if request.resolver_match.view_name  == 'website:index' %} active {% endif %}"
+                href="{% url 'website:index' %}">صفحه اصلی</a>
             </li>
 
             <li class="nav-item">
-              <a class="nav-link " href="{% url 'shop:product-grid' %}">لیست محصولات</a>
+              <a class="nav-link {% if request.resolver_match.view_name  == 'shop:product-grid' %} active {% endif %}"
+                href="{% url 'shop:product-grid' %}">لیست محصولات</a>
             </li>
 
             <li class="nav-item">
-              <a class="nav-link " href="{% url 'website:about' %}">درباره ما</a>
+              <a class="nav-link {% if request.resolver_match.view_name  == 'website:about' %} active {% endif %}"
+                href="{% url 'website:about' %}">درباره ما</a>
             </li>
 
             <li class="nav-item">
-              <a class="nav-link " href="#">ارتباط با ما</a>
+              <a class="nav-link {% if request.resolver_match.view_name  == 'website:contact' %} active {% endif %}"
+                href="#">ارتباط با ما</a>
             </li>
 
             <li class="nav-item">
@@ -323,67 +326,11 @@
   </div>
 
   <!-- Offcanvas Search -->
-  <div class="offcanvas offcanvas-end " tabindex="-1" id="offcanvasNavbarShoppingCart">
-    <div class="offcanvas-header justify-content-between border-0 pb-0 ">
-      <span> {{cart|length}}</span>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-      <div class="cart-content">
-        {% for item in cart %}
-        <!-- Product -->
-        <div class="border-bottom  mb-4" id="product-{{item.product.id}}">
-          <div class="d-flex" id="product-{{item.product.id}}">
-            <div class="flex-shrink-0">
-              <div class="avatar avatar-lg ms-3">
-                <img class="avatar-img" src="{{item.product.image.url}}" alt="Image Description">
-              </div>
-            </div>
-
-            <div class="flex-grow-1">
-              <a class="h5" href="{% url 'shop:product-detail' slug=item.product.slug %}">{{item.product.title}}</a>
-
-              <div class="d-grid py-3">
-                <div class="text-body py-1">
-                  <div class="d-flex justify-content-start align-items-center">
-                    <span class="h6">تعداد:</span>
-                    <div class="quantity">
-                      <div class="input-group input-group-sm quantity-selector px-5">
-                        <button type="button" class="btn btn-sm btn-icon btn-outline-primary" onclick="addToCart(`{{item.product.id}}`)">
-                          <i class="bi-plus"></i>
-                        </button>
-                        <input type="number" class="form-control" value="{{item.quantity}}" min="1" max="{{item.product.stock}}">
-                        <button type="button" class="btn btn-sm btn-icon btn-outline-danger"  onclick="addToCart(`{{item.product.id}}`, -1)">
-                          <i class="bi-dash"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-                <div class="text-body py-1">
-                  <div class="d-flex justify-content-start  align-items-center">
-                    <span class="h6">قیمت:</span>
-                    <span class="px-5" id="total-price">{{item.total_price|intcomma}} تومان</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- End Product -->
-        {% endfor %}
-
-      </div>
-
-      <div class="d-grid">
-        <p class="text-center" id="cart-total-price">قیمت نهایی: {{cart.get_cart_total_price|intcomma}} تومان</p>
-        <a class="btn btn-primary btn-lg" href="{% url 'cart:session-cart-summary' %}">سبد خرید</a>
-      </div>
-
-    </div>
-  </div>
+  {% include 'cart/cart.html' %}
   <!-- ========== END SECONDARY CONTENTS ========== -->
+
+  <!-- JS Custom-->
+  <script src="{% static 'js/custom.js' %}"></script>
 
   <!-- JS Jquery-->
   <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
@@ -498,9 +445,6 @@
       })
     })()
 
-    function addCommasToNumber(number) {
-      return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
 
     function addToCart(productId, quantity = 1, overide_quantity = false) {
       $.ajax({
@@ -513,71 +457,71 @@
           csrfmiddlewaretoken: '{{ csrf_token }}'
         },
         success: function (response) {
-        // Update cart total price
-        var final_price_element = $("#cart-total-price");
-        final_price_element.text("قیمت نهایی: " + addCommasToNumber(response.cart_total_price) + " تومان")
+          // Update cart total price
+          var final_price_element = $("#cart-total-price");
+          final_price_element.text("قیمت نهایی: " + addCommasToNumber(response.cart_total_price) + " تومان")
 
-        var existingItem = $('#product-' + productId);
-        // If the product exists, update its quantity and total price
-        if (existingItem.length > 0) {
-          if (response.cart.hasOwnProperty(productId)) {
-            var quantityInput = existingItem.find('.quantity input');
-            var totalPriceSpan = existingItem.find('#total-price');
+          var existingItem = $('#product-' + productId);
+          // If the product exists, update its quantity and total price
+          if (existingItem.length > 0) {
+            if (response.cart.hasOwnProperty(productId)) {
+              var quantityInput = existingItem.find('.quantity input');
+              var totalPriceSpan = existingItem.find('#total-price');
 
-            quantityInput.val(response.cart[productId].quantity);
-            totalPriceSpan.text(addCommasToNumber(response.cart[productId].total_price) + " تومان");
+              quantityInput.val(response.cart[productId].quantity);
+              totalPriceSpan.text(addCommasToNumber(response.cart[productId].total_price) + " تومان");
+            } else {
+              $("#product-" + productId).remove();
+            }
           } else {
-            $("#product-" + productId).remove();
-          }
-        } else {
-          // If the product is new, append it to the cart content
-          var cartContent = $('.cart-content');
-          var newItemHtml = '<div class="border-bottom mb-4">';
-          newItemHtml += '<div class="d-flex" id="product-' + productId + '">';
-          newItemHtml += '<div class="flex-shrink-0">';
-          newItemHtml += '<div class="avatar avatar-lg ms-3">';
-          newItemHtml += '<img class="avatar-img" src="' + response.cart[productId].image_url + '" alt="Image Description">';
-          newItemHtml += '</div>';
-          newItemHtml += '</div>';
-          newItemHtml += '<div class="flex-grow-1">';
-          newItemHtml += '<a class="h5" href="' + response.cart[productId].product_url + '">' + response.cart[productId].title + '</a>';
-          newItemHtml += '<div class="d-grid py-3">';
-          newItemHtml += '<div class="text-body py-1">';
-          newItemHtml += '<div class="d-flex justify-content-start align-items-center">';
-          newItemHtml += '<span class="h6">تعداد:</span>';
-          newItemHtml += '<div class="quantity">';
-          newItemHtml += '<div class="input-group input-group-sm quantity-selector px-5">';
-          newItemHtml += '<button type="button" class="btn btn-sm btn-icon btn-outline-primary" onclick="addToCart(\'' + productId + '\')">';
-          newItemHtml += '<i class="bi-plus"></i>';
-          newItemHtml += '</button>';
-          newItemHtml += '<input type="number" class="form-control" id="quantity-' + productId + '" value="' + response.cart[productId].quantity + '" min="1" max="10">';
-          newItemHtml += '<button type="button" class="btn btn-sm btn-icon btn-outline-danger"  onclick="addToCart(\'' + productId + '\', -1)">';
-          newItemHtml += '<i class="bi-dash"></i>';
-          newItemHtml += '</button>';
-          newItemHtml += '</div>';
-          newItemHtml += '</div>';
-          newItemHtml += '</div>';
-          newItemHtml += '</div>';
-          newItemHtml += '<div class="text-body py-1">';
-          newItemHtml += '<div class="d-flex justify-content-start  align-items-center">';
-          newItemHtml += '<span class="h6">قیمت:</span>';
-          newItemHtml += '<span class="px-5" id="total-price-' + productId + '">' + addCommasToNumber(response.cart[productId].total_price) + ' تومان</span>';
-          newItemHtml += '</div>';
-          newItemHtml += '</div>';
-          newItemHtml += '</div>';
-          newItemHtml += '</div>';
-          newItemHtml += '</div>';
-          cartContent.append(newItemHtml);
+            // If the product is new, append it to the cart content
+            var cartContent = $('.cart-content');
+            var newItemHtml = '<div class="border-bottom mb-4">';
+            newItemHtml += '<div class="d-flex" id="product-' + productId + '">';
+            newItemHtml += '<div class="flex-shrink-0">';
+            newItemHtml += '<div class="avatar avatar-lg ms-3">';
+            newItemHtml += '<img class="avatar-img" src="' + response.cart[productId].image_url + '" alt="Image Description">';
+            newItemHtml += '</div>';
+            newItemHtml += '</div>';
+            newItemHtml += '<div class="flex-grow-1">';
+            newItemHtml += '<a class="h5" href="' + response.cart[productId].product_url + '">' + response.cart[productId].title + '</a>';
+            newItemHtml += '<div class="d-grid py-3">';
+            newItemHtml += '<div class="text-body py-1">';
+            newItemHtml += '<div class="d-flex justify-content-start align-items-center">';
+            newItemHtml += '<span class="h6">تعداد:</span>';
+            newItemHtml += '<div class="quantity">';
+            newItemHtml += '<div class="input-group input-group-sm quantity-selector px-5">';
+            newItemHtml += '<button type="button" class="btn btn-sm btn-icon btn-outline-primary" onclick="addToCart(\'' + productId + '\')">';
+            newItemHtml += '<i class="bi-plus"></i>';
+            newItemHtml += '</button>';
+            newItemHtml += '<input type="number" class="form-control" id="quantity-' + productId + '" value="' + response.cart[productId].quantity + '" min="1" max="10">';
+            newItemHtml += '<button type="button" class="btn btn-sm btn-icon btn-outline-danger"  onclick="addToCart(\'' + productId + '\', -1)">';
+            newItemHtml += '<i class="bi-dash"></i>';
+            newItemHtml += '</button>';
+            newItemHtml += '</div>';
+            newItemHtml += '</div>';
+            newItemHtml += '</div>';
+            newItemHtml += '</div>';
+            newItemHtml += '<div class="text-body py-1">';
+            newItemHtml += '<div class="d-flex justify-content-start  align-items-center">';
+            newItemHtml += '<span class="h6">قیمت:</span>';
+            newItemHtml += '<span class="px-5" id="total-price-' + productId + '">' + addCommasToNumber(response.cart[productId].total_price) + ' تومان</span>';
+            newItemHtml += '</div>';
+            newItemHtml += '</div>';
+            newItemHtml += '</div>';
+            newItemHtml += '</div>';
+            newItemHtml += '</div>';
+            cartContent.append(newItemHtml);
           }
         },
         error: function (jqXHR, textStatus, errorThrown) {
           // Extract the error message from the response text if available
           var errorMessage = "";
           if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
-              errorMessage = jqXHR.responseJSON.error;
+            errorMessage = jqXHR.responseJSON.error;
           } else {
-              // If no specific error message is returned, use a generic error message
-              errorMessage = "An error occurred while processing your request.";
+            // If no specific error message is returned, use a generic error message
+            errorMessage = "An error occurred while processing your request.";
           }
 
           Toastify({
@@ -585,13 +529,18 @@
             className: 'error',
             close: true,
             style: {
-                background: 'red'
+              background: 'red'
             }
-        }).showToast();
+          }).showToast();
         }
       });
     }
-
+    document.addEventListener("DOMContentLoaded", function () {
+      let priceElements = document.querySelectorAll('.formatted-price');
+      priceElements.forEach(element => {
+        formatPriceInToman(element);
+      });
+    });
   </script>
 
   {% block extra_js %} {% endblock extra_js %}

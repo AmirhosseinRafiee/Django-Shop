@@ -29,7 +29,7 @@ class ShopProductGridView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['total_items'] = self.queryset.count()
+        context['total_items'] = self.get_queryset().count()
         context['categories'] = ProductCategoryModel.objects.all()
         return context
 

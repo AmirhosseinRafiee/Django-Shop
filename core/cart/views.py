@@ -5,7 +5,7 @@ from shop.models import ProductModel, ProductStatus
 from.cart import CartSession
 
 class CartSummaryView(TemplateView):
-    template_name = 'cart/cart.html'
+    template_name = 'cart/cart-summary.html'
 
 class SessionAddProductView(View):
 

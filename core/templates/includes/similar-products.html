@@ -1,0 +1,78 @@
+{% load static %}
+
+<div class="container content-space-2 content-space-lg-3">
+    <!-- Title -->
+    <div class="w-md-75 w-lg-50 text-center mx-md-auto mb-5 mb-md-9">
+        <h2>محصولات مشابه</h2>
+    </div>
+    <!-- End Title -->
+
+    <div class="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
+        {% for product in similar_products %}
+        <div class="col mb-4">
+            <!-- Card -->
+            <div class="card card-bordered shadow-none text-center h-100">
+                <div class="card-pinned">
+                    <img class="card-img-top" src="{{product.image.url}}" alt="Image Description">
+
+                    <div class="card-pinned-top-start">
+                    </div>
+
+                    <div class="card-pinned-top-end">
+                        {% if user.is_authenticated %}
+                        <button type="button" class="btn btn-outline-secondary btn-xs btn-icon rounded-circle"
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="افزودن به علایق">
+                            <i class="bi-heart"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="mb-1">
+                        {% for category in product.category.all %}
+                        <a class="link-sm link-secondary" href="#">{{category.title}}</a>
+                        {% if not forloop.last %}
+                        ,
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <a class="text-dark fw-bolder"
+                        href="{% url 'shop:product-detail' slug=product.slug %}">{{product.title}}</a>
+
+                    {% if product.is_discounted %}
+                    <p class="card-text text-dark fs-4">
+                        <span class="formatted-price">{{product.get_price}}</span>
+                        <del><span class="text-body me-1 fs-6 formatted-price">{{product.price}}</span></del>
+                    </p>
+                    {% else %}
+                    <p class="card-text text-dark fs-4 formatted-price"> {{product.price}}</p>
+                    {% endif %}
+
+                </div>
+
+                <div class="card-footer pt-0">
+                    <!-- Rating -->
+                    <a class="d-inline-flex align-items-center mb-3" href="#">
+                        <div class="d-flex gap-1 ms-2">
+                            <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
+                            <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
+                            <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
+                            <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
+                            <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
+                        </div>
+                        <span class="small">0</span>
+                    </a>
+                    <!-- End Rating -->
+
+                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill"
+                        onclick="addToCart(`{{product.id}}`)">افزودن به سبد خرید</button>
+                </div>
+            </div>
+            <!-- End Card -->
+        </div>
+        <!-- End Col -->
+        {% endfor %}
+    </div>
+    <!-- End Row -->
+</div>

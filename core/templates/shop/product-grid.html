@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load humanize %}
 
 {% block content %}
 <!-- Breadcrumb -->
@@ -17,10 +16,10 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb mb-0 ">
             <li class="breadcrumb-item ps-2">
-              <a href="/index.html">خرید کنید</a>
+              <a href="#">فروشگاه</a>
             </li>
             <li class="breadcrumb-item">
-              <a href="/products-grid.html">محصولات</a>
+              <a href="#">محصولات</a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">توری</li>
           </ol>
@@ -80,12 +79,12 @@
               <div class="d-grid gap-2">
                 <div class="form-group">
                   <label class="form-label d-flex" for="min-price-filter">کمترین قیمت</label>
-                  <input class="form-control" type="number" name="min_price" placeholder="کمترین قیمت مد نظر"
+                  <input class="form-control" type="number" name="price_min" placeholder="کمترین قیمت مد نظر"
                     id="min-price-filter">
                 </div>
                 <div class="form-group">
                   <label class="form-label d-flex" for="max-price-filter">بیشترین قیمت</label>
-                  <input class="form-control" type="number" name="max_price" placeholder="بیشترین قیمت مد نظر"
+                  <input class="form-control" type="number" name="price_max" placeholder="بیشترین قیمت مد نظر"
                     id="max-price-filter">
                 </div>
               </div>
@@ -104,7 +103,9 @@
               </div>
             </div>
             <div class="d-grid">
-              <button type="submit" class="btn btn-white btn-transition">اعمال فیلتر</button>
+              <button type="submit" class="btn btn-outline-primary btn-transition mb-4">اعمال فیلتر</button>
+              <a href="{% url 'shop:product-grid' %}" class="btn btn-outline-danger btn-transition mb-4">حذف فیلتر
+                ها</a>
             </div>
           </form>
           <!-- End Form -->
@@ -178,10 +179,12 @@
               </div> -->
 
               <div class="card-pinned-top-end">
+                {% if request.user.is_authenticated %}
                 <button type="button" class="btn btn-outline-secondary btn-xs btn-icon rounded-circle"
                   data-bs-toggle="tooltip" data-bs-placement="top" title="افزودن به علایق">
                   <i class="bi-heart"></i>
                 </button>
+                {% endif %}
               </div>
             </div>
 
@@ -199,10 +202,12 @@
                 <a class="text-dark" href="{% url 'shop:product-detail' slug=object.slug %}">{{object.title}}</a>
               </h4>
               {% if object.is_discounted %}
-              <p class="card-text text-dark fs-4">{{object.discounted_price|intcomma}} تومان<span
-                  class="text-body me-1 fs-6"><del>{{object.price|intcomma}} تومان</del></span></p>
+              <p class="card-text text-dark fs-4">
+                <span class="formatted-price">{{object.get_price}}</span>
+                <del><span class="text-body me-1 fs-6 formatted-price">{{object.price}}</span></del>
+              </p>
               {% else %}
-              <p class="card-text text-dark fs-4"> {{object.price|intcomma}} تومان</p>
+              <p class="card-text text-dark fs-4 formatted-price"> {{object.price}}</p>
               {% endif %}
             </div>
 
@@ -371,13 +376,5 @@
     let new_url = window.location.pathname + "?" + current_url_params.toString()
     window.location.href = new_url
   });
-</script>
-<script>
-  function changePage(page_number) {
-    let current_url_params = new URLSearchParams(window.location.search)
-    current_url_params.set("page", page_number)
-    let new_url = window.location.pathname + "?" + current_url_params.toString()
-    window.location.href = new_url
-  }
 </script>
 {% endblock %}
