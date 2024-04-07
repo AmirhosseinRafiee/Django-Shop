@@ -1,0 +1,567 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <!-- Required Meta Tags Always Come First -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Title -->
+    <title>{% block title %} {% endblock title %}</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- CSS Implementing Plugins -->
+    <link rel="stylesheet" href="{% static 'css/vendor.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/font/bootstrap-icons.css' %}">
+
+    <!-- CSS Front Template -->
+    <link rel="stylesheet" href="{% static 'css/theme.min.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'vendor/toastify/toastify.css' %}">
+
+    {% block extra_css %} {% endblock extra_css %}
+
+    {% block extra_css_no_compress %} {% endblock extra_css_no_compress %}
+</head>
+
+<body>
+    <!-- ========== HEADER ========== -->
+    <header id="header" class="navbar navbar-expand-lg navbar-end navbar-light">
+        <div class="container">
+            <nav class="js-mega-menu navbar-nav-wrap">
+                <!-- Default Logo -->
+                <a class="navbar-brand" href="{% url 'website:index' %}" aria-label="Front">
+                    <img class="navbar-brand-logo" src="{% static 'svg/logos/logo.svg' %}" alt="Logo">
+                </a>
+                <!-- End Default Logo -->
+
+                <!-- Toggler -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-default">
+                        <i class="bi-list"></i>
+                    </span>
+                    <span class="navbar-toggler-toggled">
+                        <i class="bi-x"></i>
+                    </span>
+                </button>
+                <!-- End Toggler -->
+
+                <!-- Collapse -->
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.view_name  == 'website:index' %} active {% endif %}"
+                                href="{% url 'website:index' %}">صفحه اصلی</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.view_name  == 'shop:product-grid' %} active {% endif %}"
+                                href="{% url 'shop:product-grid' %}">لیست محصولات</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.view_name  == 'website:about' %} active {% endif %}"
+                                href="{% url 'website:about' %}">درباره ما</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.view_name  == 'website:contact' %} active {% endif %}"
+                                href="#">ارتباط با ما</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <!-- Search -->
+                            <button class="btn btn-ghost-secondary btn-icon" type="button" data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvasNavbarSearch" aria-controls="offcanvasNavbarSearch">
+                                <i class="bi-search"></i>
+                            </button>
+                            <!-- End Search -->
+
+                            {% if request.user.is_authenticated %}
+
+                            <button class="btn btn-ghost-secondary btn-icon" id="dropdownMenuLink"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="avatar avatar-sm avatar-circle">
+                                    <img class="avatar-img" src="{% static 'img/160x160/img10.jpg' %}"
+                                        alt="Image Description">
+                                </span>
+                            </button>
+
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="{% url 'dashboard:home' %}">پروفایل</a>
+                                <form action="{% url 'accounts:logout' %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item btn btn-link">خروج</button>
+                                </form>
+
+                            </div>
+                            {% else %}
+                            <a class="btn btn-primary btn-transition" href="{% url 'accounts:login' %}">ورود</a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+                <!-- End Collapse -->
+            </nav>
+        </div>
+    </header>
+
+    <!-- ========== END HEADER ========== -->
+
+    <!-- ========== MAIN CONTENT ========== -->>
+    <main id="content" role="main" class="bg-light">
+        <!-- Breadcrumb -->
+        <div class="navbar-dark bg-dark" style="
+          background-image: url({% static 'svg/components/wave-pattern-light.svg' %});">
+            <div class="container content-space-1 content-space-b-lg-3">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="d-none d-lg-block">
+                            <h1 class="h2 text-white">داشبورد</h1>
+                        </div>
+
+                        <!-- Breadcrumb -->
+                        {% block breadcrumb %} {% endblock %}
+                        <!-- End Breadcrumb -->
+                    </div>
+                    <!-- End Col -->
+
+                    <div class="col-auto">
+                        <div class="d-none d-lg-block">
+                            <a class="btn btn-soft-light btn-sm" href="{% url 'accounts:logout' %}">خروج</a>
+                        </div>
+                        <!-- Responsive Toggle Button -->
+                        <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#sidebarNav" aria-controls="sidebarNav" aria-expanded="false"
+                            aria-label="Toggle navigation">
+                            <span class="navbar-toggler-default">
+                                <i class="bi-list"></i>
+                            </span>
+                            <span class="navbar-toggler-toggled">
+                                <i class="bi-x"></i>
+                            </span>
+                        </button>
+                        <!-- End Responsive Toggle Button -->
+                    </div>
+                    <!-- End Col -->
+                </div>
+                <!-- End Row -->
+            </div>
+        </div>
+        <!-- End Breadcrumb -->
+
+        <!-- Content Section -->
+        <div class="container content-space-1 content-space-t-lg-0 content-space-b-lg-2 mt-lg-n10">
+            <div class="row">
+                <div class="col-lg-3">
+                    <!-- Navbar -->
+                    {% include 'dashboard/admin/sidebar.html' %}
+                    <!-- End Navbar -->
+                </div>
+                <!-- End Col -->
+
+                <div class="col-lg-9">
+                    {% block card %} {% endblock %}
+                </div>
+                <!-- End Col -->
+            </div>
+            <!-- End Row -->
+        </div>
+        <!-- End Content Section -->
+    </main>
+    <!-- ========== END MAIN CONTENT ========== -->
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="bg-dark">
+        <div class="container pb-1 pb-lg-5">
+            <div class="row content-space-t-2">
+                <div class="col-lg-3 mb-7 mb-lg-0">
+                    <!-- Logo -->
+                    <div class="mb-5">
+                        <a class="navbar-brand" href="{% url 'website:index' %}" aria-label="Space">
+                            <img class="navbar-brand-logo" src="{% static 'svg/logos/logo-white.svg' %}"
+                                alt="Image Description">
+                        </a>
+                    </div>
+                    <!-- End Logo -->
+
+                    <!-- List -->
+                    <ul class="list-unstyled list-py-1">
+                        <li><a class="link-sm link-light" href="#"><i class="bi-geo-alt-fill me-1"></i>153 ویلیامسون
+                                پلازا،
+                                مگیبرگ</a></li>
+                        <li><a class="link-sm link-light" href="tel:1-062-109-9222"><i
+                                    class="bi-telephone-inbound-fill me-1"></i>
+                                +1 (062) 109-9222</a></li>
+                    </ul>
+                    <!-- End List -->
+
+                </div>
+                <!-- End Col -->
+
+                <div class="col-sm mb-7 mb-sm-0">
+                    <h5 class="text-white mb-3">شرکت</h5>
+
+                    <!-- List -->
+                    <ul class="list-unstyled list-py-1 mb-0">
+                        <li><a class="link-sm link-light" href="#">درباره</a></li>
+                        <li><a class="link-sm link-light" href="#">مشاغل <span
+                                    class="badge bg-warning text-dark rounded-pill ms-1">استخدام می کنیم</span></a></li>
+                        <li><a class="link-sm link-light" href="#">بلاگ</a></li>
+                        <li><a class="link-sm link-light" href="#">مشتریان <i
+                                    class="bi-box-arrow-up-right small ms-1"></i></a></li>
+                        <li><a class="link-sm link-light" href="#">ما را استخدام کنید</a></li>
+                    </ul>
+                    <!-- End List -->
+                </div>
+                <!-- End Col -->
+
+                <div class="col-sm mb-7 mb-sm-0">
+                    <h5 class="text-white mb-3">امکانات</h5>
+
+                    <!-- List -->
+                    <ul class="list-unstyled list-py-1 mb-0">
+                        <li><a class="link-sm link-light" href="#">مطبوعات <i
+                                    class="bi-box-arrow-up-right small ms-1"></i></a></li>
+                        <li><a class="link-sm link-light" href="#">یادداشت های انتشار</a></li>
+                        <li><a class="link-sm link-light" href="#">ادغام ها</a></li>
+                        <li><a class="link-sm link-light" href="#">قیمت گذاری</a></li>
+                    </ul>
+                    <!-- End List -->
+                </div>
+                <!-- End Col -->
+
+                <div class="col-sm mb-7 mb-sm-0">
+                    <h5 class="text-white mb-3">مستندات</h5>
+
+                    <!-- List -->
+                    <ul class="list-unstyled list-py-1 mb-0">
+                        <li><a class="link-sm link-light" href="#">حمایت کردن</a></li>
+                        <li><a class="link-sm link-light" href="#">اسناد</a></li>
+                        <li><a class="link-sm link-light" href="#">وضعیت</a></li>
+                        <li><a class="link-sm link-light" href="#">مرجع API</a></li>
+                        <li><a class="link-sm link-light" href="#">الزامات فنی</a></li>
+                    </ul>
+                    <!-- End List -->
+                </div>
+                <!-- End Col -->
+
+                <div class="col-sm">
+                    <h5 class="text-white mb-3">منابع</h5>
+
+                    <!-- List -->
+                    <ul class="list-unstyled list-py-1 mb-5">
+                        <li><a class="link-sm link-light" href="#"><i class="bi-question-circle-fill me-1"></i> کمک</a>
+                        </li>
+                        <li><a class="link-sm link-light" href="#"><i class="bi-person-circle me-1"></i> حساب شما</a>
+                        </li>
+                    </ul>
+                    <!-- End List -->
+                </div>
+                <!-- End Col -->
+            </div>
+            <!-- End Row -->
+
+            <div class="border-top border-white-10 my-7"></div>
+
+            <div class="row mb-7">
+                <div class="col-sm mb-3 mb-sm-0">
+                    <!-- Socials -->
+                    <ul class="list-inline list-separator list-separator-light mb-0">
+                        <li class="list-inline-item">
+                            <a class="link-sm link-light" href="#">حریم خصوصی و خط مشی</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="link-sm link-light" href="#">مقررات</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="link-sm link-light" href="#">نقشه سایت</a>
+                        </li>
+                    </ul>
+                    <!-- End Socials -->
+                </div>
+
+                <div class="col-sm-auto">
+                    <!-- Socials -->
+                    <ul class="list-inline mb-0">
+                        <li class="list-inline-item">
+                            <a class="btn btn-soft-light btn-xs btn-icon" href="#">
+                                <i class="bi-facebook"></i>
+                            </a>
+                        </li>
+
+                        <li class="list-inline-item">
+                            <a class="btn btn-soft-light btn-xs btn-icon" href="#">
+                                <i class="bi-google"></i>
+                            </a>
+                        </li>
+
+                        <li class="list-inline-item">
+                            <a class="btn btn-soft-light btn-xs btn-icon" href="#">
+                                <i class="bi-twitter"></i>
+                            </a>
+                        </li>
+
+                        <li class="list-inline-item">
+                            <a class="btn btn-soft-light btn-xs btn-icon" href="#">
+                                <i class="bi-github"></i>
+                            </a>
+                        </li>
+
+                        <li class="list-inline-item">
+                            <!-- Button Group -->
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-soft-light btn-xs dropdown-toggle"
+                                    id="footerSelectLanguage" data-bs-toggle="dropdown" aria-expanded="false"
+                                    data-bs-dropdown-animation>
+                                    <span class="d-flex align-items-center">
+                                        <img class="avatar avatar-xss avatar-circle ms-2"
+                                            src="{% static 'vendor/flag-icon-css/flags/1x1/us.svg' %}"
+                                            alt="Image description" width="16" />
+                                        <span>انگلیسی (US)</span>
+                                    </span>
+                                </button>
+
+                                <div class="dropdown-menu" aria-labelledby="footerSelectLanguage">
+                                    <a class="dropdown-item d-flex align-items-center active" href="#">
+                                        <img class="avatar avatar-xss avatar-circle ms-2"
+                                            src="{% static 'vendor/flag-icon-css/flags/1x1/us.svg' %}"
+                                            alt="Image description" width="16" />
+                                        <span>انگلیسی (US)</span>
+                                    </a>
+                                    <a class="dropdown-item d-flex align-items-center" href="#">
+                                        <img class="avatar avatar-xss avatar-circle ms-2"
+                                            src="{% static 'vendor/flag-icon-css/flags/1x1/de.svg' %}"
+                                            alt="Image description" width="16" />
+                                        <span>آلمانی</span>
+                                    </a>
+                                    <a class="dropdown-item d-flex align-items-center" href="#">
+                                        <img class="avatar avatar-xss avatar-circle ms-2"
+                                            src="{% static 'vendor/flag-icon-css/flags/1x1/es.svg' %}"
+                                            alt="Image description" width="16" />
+                                        <span>اسپانیا</span>
+                                    </a>
+                                    <a class="dropdown-item d-flex align-items-center" href="#">
+                                        <img class="avatar avatar-xss avatar-circle ms-2"
+                                            src="{% static 'vendor/flag-icon-css/flags/1x1/cn.svg' %}"
+                                            alt="Image description" width="16" />
+                                        <span>چینی</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- End Button Group -->
+                        </li>
+                    </ul>
+                    <!-- End Socials -->
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="w-md-85 text-lg-center mx-lg-auto">
+                <p class="text-white-50 small">&copy; جلو. Htmlstream 2021. تمامی حقوق محفوظ است.</p>
+                <p class="text-white-50 small">هنگامی که از سایت‌ها، سرویس‌ها یا ابزارهای ما بازدید می‌کنید یا با آنها
+                    تعامل
+                    می‌کنید، ما یا ارائه‌دهندگان خدمات مجاز ما ممکن است از کوکی‌ها برای ذخیره اطلاعات استفاده کنیم تا
+                    تجربه بهتر،
+                    سریع‌تر و ایمن‌تری و برای اهداف بازاریابی به شما ارائه کنیم.</p>
+            </div>
+            <!-- End Copyright -->
+        </div>
+    </footer>
+
+    <!-- ========== END FOOTER ========== -->
+
+    <!-- ========== SECONDARY CONTENTS ========== -->
+    <!-- Sign Up -->
+
+    <!-- Go To -->
+    <a class="js-go-to go-to position-fixed" href="javascript:;" style="visibility: hidden;" data-hs-go-to-options='{
+       "offsetTop": 700,
+       "position": {
+         "init": {
+           "right": "2rem"
+         },
+         "show": {
+           "bottom": "2rem"
+         },
+         "hide": {
+           "bottom": "-2rem"
+         }
+       }
+     }'>
+        <i class="bi-chevron-up"></i>
+    </a>
+
+    <!-- Offcanvas Search -->
+    <div class="offcanvas offcanvas-top offcanvas-navbar-search bg-light" tabindex="-1" id="offcanvasNavbarSearch">
+        <div class="offcanvas-body">
+            <div class="container">
+                <div class="w-lg-75 mx-lg-auto">
+                    <div class="d-flex justify-content-end mb-3">
+                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                            aria-label="Close"></button>
+                    </div>
+
+                    <div class="mb-7">
+                        <!-- Form -->
+                        <form>
+                            <!-- Input Card -->
+                            <div class="input-card">
+                                <div class="input-card-form">
+                                    <input type="text" class="form-control form-control-lg" placeholder="جستجو محصولات"
+                                        aria-label="جستجو محصولات">
+                                </div>
+                                <button type="button" class="btn btn-primary btn-lg">جستجو کردن</button>
+                            </div>
+                            <!-- End Input Card -->
+                        </form>
+                        <!-- End Form -->
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== END SECONDARY CONTENTS ========== -->
+
+    <!-- JS Custom-->
+    <script src="{% static 'js/custom.js' %}"></script>
+
+    <!-- JS Jquery-->
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+
+    <!-- JS Implementing Plugins -->
+    <script src="{% static 'js/vendor.min.js' %}"></script>
+
+    <!-- JS Front -->
+    <script src="{% static 'js/theme.min.js' %}"></script>
+
+    <!-- JS Front -->
+    <script src="{% static 'vendor/toastify/toastify.js' %}"></script>
+
+    <!-- JS Plugins Init. -->
+    <script>
+        (function () {
+            // INITIALIZATION OF MEGA MENU
+            // =======================================================
+            new HSMegaMenu('.js-mega-menu', {
+                desktop: {
+                    position: 'left'
+                }
+            })
+
+
+            // INITIALIZATION OF SHOW ANIMATIONS
+            // =======================================================
+            new HSShowAnimation('.js-animation-link')
+
+
+            // INITIALIZATION OF BOOTSTRAP VALIDATION
+            // =======================================================
+            HSBsValidation.init('.js-validate', {
+                onSubmit: data => {
+                    data.event.preventDefault()
+                    alert('Submited')
+                }
+            })
+
+
+            // INITIALIZATION OF BOOTSTRAP DROPDOWN
+            // =======================================================
+            HSBsDropdown.init()
+
+
+            // INITIALIZATION OF GO TO
+            // =======================================================
+            new HSGoTo('.js-go-to')
+
+
+            // INITIALIZATION OF SWIPER
+            // =======================================================
+            var sliderThumbs = new Swiper('.js-swiper-shop-hero-thumbs', {
+                watchSlidesVisibility: true,
+                watchSlidesProgress: true,
+                history: false,
+                slidesPerView: 3,
+                spaceBetween: 15,
+                on: {
+                    beforeInit: (swiper) => {
+                        const css = `.swiper-slide-thumb-active .swiper-thumb-progress .swiper-thumb-progress-path {
+                  opacity: 1;
+                  -webkit-animation: ${swiper.originalParams.autoplay.delay}ms linear 0ms forwards swiperThumbProgressDash;
+                  animation: ${swiper.originalParams.autoplay.delay}ms linear 0ms forwards swiperThumbProgressDash;
+              }`
+                        style = document.createElement('style')
+                        document.head.appendChild(style)
+                        style.type = 'text/css'
+                        style.appendChild(document.createTextNode(css));
+
+                        swiper.el.querySelectorAll('.js-swiper-thumb-progress')
+                            .forEach(slide => {
+                                slide.insertAdjacentHTML('beforeend', '<span class="swiper-thumb-progress"><svg version="1.1" viewBox="0 0 160 160"><path class="swiper-thumb-progress-path" d="M 79.98452083651917 4.000001576345426 A 76 76 0 1 1 79.89443752470656 4.0000733121155605 Z"></path></svg></span>')
+                            })
+                    },
+                },
+            });
+
+            var swiper = new Swiper('.js-swiper-shop-classic-hero', {
+                autoplay: true,
+                loop: true,
+                navigation: {
+                    nextEl: '.js-swiper-shop-classic-hero-button-next',
+                    prevEl: '.js-swiper-shop-classic-hero-button-prev',
+                },
+                thumbs: {
+                    swiper: sliderThumbs
+                }
+            });
+
+
+            // INITIALIZATION OF COUNTDOWN
+            // =======================================================
+            const oneYearFromNow = new Date()
+
+            document.querySelectorAll('.js-countdown').forEach(item => {
+                const days = item.querySelector('.js-cd-days'),
+                    hours = item.querySelector('.js-cd-hours'),
+                    minutes = item.querySelector('.js-cd-minutes'),
+                    seconds = item.querySelector('.js-cd-seconds')
+
+                countdown(oneYearFromNow.setFullYear(
+                    oneYearFromNow.getFullYear() + 1),
+                    ts => {
+                        days.innerHTML = ts.days
+                        hours.innerHTML = ts.hours
+                        minutes.innerHTML = ts.minutes
+                        seconds.innerHTML = ts.seconds
+                    },
+                    countdown.DAYS | countdown.HOURS | countdown.MINUTES | countdown.SECONDS
+                )
+            })
+        })()
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let priceElements = document.querySelectorAll('.formatted-price');
+            priceElements.forEach(element => {
+                formatPriceInToman(element);
+            });
+        });
+    </script>
+
+    {% block extra_js %} {% endblock extra_js %}
+
+    {% block extra_js_no_compress %} {% endblock extra_js_no_compress %}
+
+    {% include 'messages.html' %}
+</body>
+
+</html>
