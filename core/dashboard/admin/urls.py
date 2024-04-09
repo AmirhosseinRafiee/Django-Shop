@@ -5,4 +5,6 @@ app_name = 'admin'
 
 urlpatterns = [
     path('home/', views.AdminDashboradHomeView.as_view(), name='home'),
+    path('security-edit/', views.AdminSecurotyEditView.as_view(), name='security-edit'),
+    path('profile-edit/', views.AdminProfileEditView.as_view(), name='profile-edit'),
 ]
