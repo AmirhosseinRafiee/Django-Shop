@@ -16,7 +16,7 @@ class AdminDashboradHomeView(LoginRequiredMixin, AdminAccessPermission, Template
 class AdminSecurotyEditView(LoginRequiredMixin, AdminAccessPermission, SuccessMessageMixin, PasswordChangeView):
     template_name = 'dashboard/admin/profile/security-edit.html'
     form_class = AdminPasswordChangeForm
-    success_url = reverse_lazy('dashboard:admin:securiyt-edit')
+    success_url = reverse_lazy('dashboard:admin:security-edit')
     success_message = _('بروز رسانی رمزعبور با موفقیت انجام شد')
 
 class AdminProfileEditView(LoginRequiredMixin, AdminAccessPermission, SuccessMessageMixin, UpdateView):

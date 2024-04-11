@@ -1,10 +1,10 @@
-{% extends 'dashboard/admin/base.html' %}
+{% extends 'dashboard/customer/base.html' %}
 
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb breadcrumb-light mb-0">
         <li class="breadcrumb-item">حساب</li>
-        <li class="breadcrumb-item">داشبورد ادمین</li>
+        <li class="breadcrumb-item">داشبورد</li>
         <li class="breadcrumb-item active" aria-current="page">
             ویرایش پروفایل
         </li>
@@ -35,7 +35,7 @@
                                 alt="Image Description">
                         </label>
 
-                        <form action="{% url 'dashboard:admin:profile-image-edit' %}" method="post"
+                        <form action="{% url 'dashboard:customer:profile-image-edit' %}" method="post"
                             class="d-grid d-sm-flex gap-2 me-4" enctype="multipart/form-data"
                             onsubmit="return validateForm()">
                             {% csrf_token %}
