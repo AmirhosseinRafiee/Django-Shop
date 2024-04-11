@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, UpdateView
+from django.views.generic import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
@@ -7,11 +7,8 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from accounts.models import Profile
-from ..permissions import AdminAccessPermission
-from .forms import AdminPasswordChangeForm, AdminProfileEditForm, AdminProfileImageEditForm
-
-class AdminDashboradHomeView(LoginRequiredMixin, AdminAccessPermission, TemplateView):
-    template_name = 'dashboard/admin/home.html'
+from ...permissions import AdminAccessPermission
+from ..forms import AdminPasswordChangeForm, AdminProfileEditForm, AdminProfileImageEditForm
 
 class AdminSecurotyEditView(LoginRequiredMixin, AdminAccessPermission, SuccessMessageMixin, PasswordChangeView):
     template_name = 'dashboard/admin/profile/security-edit.html'

@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, UpdateView
+from django.views.generic import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
@@ -7,11 +7,8 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from accounts.models import Profile
-from ..permissions import CustomerAccessPermission
-from .forms import CustomerPasswordChangeForm, CustomerProfileEditForm, CustomerProfileImageEditForm
-
-class CustomerDashboradHomeView(LoginRequiredMixin, CustomerAccessPermission, TemplateView):
-    template_name = 'dashboard/customer/home.html'
+from ...permissions import CustomerAccessPermission
+from ..forms import CustomerPasswordChangeForm, CustomerProfileEditForm, CustomerProfileImageEditForm
 
 class CustomerSecurotyEditView(LoginRequiredMixin, CustomerAccessPermission, SuccessMessageMixin, PasswordChangeView):
     template_name = 'dashboard/customer/profile/security-edit.html'
