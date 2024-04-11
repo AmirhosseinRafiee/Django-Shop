@@ -62,8 +62,7 @@
                                                 data-product-id="{{ item.product.id }}">
                                                 {% with ''|center:item.product.stock as range %}
                                                 {% for _ in range %}
-                                                <option value="{{forloop.counter}}" {% if item.quantity==forloop.counter
-                                                    %} selected {% endif %}>
+                                                <option value="{{forloop.counter}}" {% if item.quantity == forloop.counter %} selected {% endif %}>
                                                     {{forloop.counter}}
                                                 </option>
                                                 {% endfor %}

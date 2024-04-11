@@ -37,8 +37,8 @@ class CartSession:
         cart = self.cart.copy()
         for product in products:
             cart[str(product.id)]["product"] = product
+            cart[str(product.id)]["total_price"] = product.get_price() * cart[str(product.id)]["quantity"]
         for item in cart.values():
-            item["total_price"] = product.get_price() * item["quantity"]
             yield item
 
     def __len__(self):
