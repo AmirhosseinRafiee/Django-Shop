@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import PasswordChangeForm
-from django.utils.translation import gettext_lazy as _
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from accounts.models import Profile
 
 class AdminPasswordChangeForm(PasswordChangeForm):
@@ -22,3 +22,19 @@ class AdminProfileEditForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['first_name', 'last_name', 'phone_number']
+
+class AdminProfileImageEditForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['image']
+
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if image == self.instance.image:
+            raise forms.ValidationError(_("لطفاً یک تصویر را انتخاب کنید"))
+
+        filesize = image.size
+        if filesize > 2 * 1024 * 1024:
+            raise forms.ValidationError(_("حداکثر اندازه فایل قابل بارگذاری ۲ مگابایت است"))
+
+        return image

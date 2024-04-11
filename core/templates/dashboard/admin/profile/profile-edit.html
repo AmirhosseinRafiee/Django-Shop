@@ -1,5 +1,4 @@
 {% extends 'dashboard/admin/base.html' %}
-{% load static %}
 
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
@@ -23,43 +22,36 @@
 
         <!-- Body -->
         <div class="card-body">
-            <form action="">
-                <!-- Form -->
-                <div class="row mb-4">
-                    <label class="col-sm-3 col-form-label form-label">عکس پروفایل</label>
+            <!-- Form -->
+            <div class="row mb-4">
+                <label class="col-sm-3 col-form-label form-label">عکس پروفایل</label>
 
-                    <div class="col-sm-9">
-                        <!-- Media -->
-                        <div class="d-flex align-items-center">
-                            <!-- Avatar -->
-                            <label class="avatar avatar-xl avatar-circle" for="avatarUploader">
-                                <img id="avatarImg" class="avatar-img" src="{% static 'img/160x160/img9.jpg' %}"
-                                    alt="Image Description">
-                            </label>
+                <div class="col-sm-9">
+                    <!-- Media -->
+                    <div class="d-flex align-items-center">
+                        <!-- Avatar -->
+                        <label class="avatar avatar-xl avatar-circle" for="avatarUploader">
+                            <img id="avatarImg" class="avatar-img" src="{{request.user.profile.image.url}}"
+                                alt="Image Description">
+                        </label>
 
-                            <div class="d-grid d-sm-flex gap-2 me-4">
-                                <div class="form-attachment-btn btn btn-primary btn-sm">آپلود عکس
-                                    <input type="file" class="js-file-attach form-attachment-btn-label"
-                                        id="avatarUploader" data-hs-file-attach-options='{
-                                              "textTarget": "#avatarImg",
-                                              "mode": "image",
-                                              "targetAttr": "src",
-                                              "resetTarget": ".js-file-attach-reset-img",
-                                              "resetImg": "./assets/img/160x160/img1.jpg",
-                                              "allowTypes": [".png", ".jpeg", ".jpg"]
-                                           }'>
-                                </div>
-                                <!-- End Avatar -->
-
-                                <button type="button" class="js-file-attach-reset-img btn btn-white btn-sm">حذف
-                                    کردن</button>
+                        <form action="{% url 'dashboard:admin:profile-image-edit' %}" method="post"
+                            class="d-grid d-sm-flex gap-2 me-4" enctype="multipart/form-data"
+                            onsubmit="return validateForm()">
+                            {% csrf_token %}
+                            <div class="form-attachment-btn btn btn-primary btn-sm">آپلود عکس
+                                <input type="file" name="image" class="form-attachment-btn-label" id="avatarUploader"
+                                    accept="image/jpeg, image/jpg, image/png" onchange="previewImage(this)">
                             </div>
-                        </div>
-                        <!-- End Media -->
+                            <!-- End Avatar -->
+
+                            <button type="submit" class="js-file-attach-reset-img btn btn-white btn-sm">ارسال</button>
+                        </form>
                     </div>
+                    <!-- End Media -->
                 </div>
-                <!-- End Form -->
-            </form>
+            </div>
+            <!-- End Form -->
         </div>
     </div>
     <!-- Card -->
@@ -133,4 +125,38 @@
     <!-- End Card -->
 
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#avatarImg').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            $('#avatarImg').attr('src', '{{request.user.profile.image.url}}');
+        }
+    }
+    function validateForm() {
+        var imageField = document.getElementById("avatarUploader");
+        if (!imageField.value) {
+            Toastify({
+                text: "لطفاً یک تصویر را انتخاب کنید",
+                duration: 3000, // 3 seconds
+                close: true,
+                gravity: "top", // Display at the top
+                position: "right", // Center horizontally
+                style: {
+                    background: "blue",
+                }
+            }).showToast();
+            return false; // Prevent form submission
+        }
+        return true;
+    }
+</script>
+
 {% endblock %}

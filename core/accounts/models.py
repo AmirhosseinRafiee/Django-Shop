@@ -70,7 +70,13 @@ class Profile(models.Model):
     user = models.OneToOneField('User', on_delete=models.CASCADE)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='profile', default='profile/default.png')
     phone_number = models.CharField(max_length=12, validators=[validate_iranian_phone_number])
     gender = models.IntegerField(choices=Gender.choices, default=Gender.unknown.value)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
+
+    def full_name(self):
+        if self.first_name or self.last_name:
+            return f'{self.first_name} {self.last_name}'.strip()
+        return 'کاربر جدید'
