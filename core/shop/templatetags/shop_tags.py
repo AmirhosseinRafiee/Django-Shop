@@ -16,6 +16,6 @@ def similar_products(product: ProductModel):
     products = ProductModel.objects.filter(
         status=ProductStatus.publish.value,
         category__in=product.category.all()
-    ).exclude(id=product.id).prefetch_related('category').order_by('-created_date')[:4]
+    ).exclude(id=product.id).prefetch_related('category').order_by('-created_date').distinct()[:4]
     return {'similar_products': products}
 

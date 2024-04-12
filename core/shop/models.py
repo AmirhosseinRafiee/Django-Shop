@@ -73,6 +73,9 @@ class ProductModel(models.Model):
     def is_discounted(self):
         return self.discount_percent != 0
 
+    def is_published(self):
+        return self.status == ProductStatus.publish.value
+
 class ProductImageModel(models.Model):
     proudct = models.ForeignKey('ProductModel', on_delete=models.CASCADE)
     file = models.ImageField(upload_to='product/extra-img/')
