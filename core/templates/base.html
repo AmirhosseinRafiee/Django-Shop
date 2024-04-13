@@ -461,6 +461,9 @@
           var final_price_element = $("#cart-total-price");
           final_price_element.text("قیمت نهایی: " + addCommasToNumber(response.cart_total_price) + " تومان")
 
+          // Update cart total quantity
+          $("#id-cart-length").text(response.cart_total_quantity)
+
           var existingItem = $('#product-' + productId);
           // If the product exists, update its quantity and total price
           if (existingItem.length > 0) {
@@ -471,7 +474,7 @@
               quantityInput.val(response.cart[productId].quantity);
               totalPriceSpan.text(addCommasToNumber(response.cart[productId].total_price) + " تومان");
             } else {
-              $("#product-" + productId).remove();
+              $("#product-" + productId).parent().remove();
             }
           } else {
             // If the product is new, append it to the cart content

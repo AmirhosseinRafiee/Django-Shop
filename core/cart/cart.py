@@ -64,6 +64,7 @@ class CartSession:
             cart[str(product.id)]["total_price"] = product.get_price() * cart[str(product.id)]["quantity"]
         cart_json = {'cart': cart}
         cart_json["cart_total_price"] = self.get_cart_total_price()
+        cart_json["cart_total_quantity"] = len(self)
         return cart_json
 
     def _validate_quantity(self, product_id, product_stock, quantity, overide_quantity):
