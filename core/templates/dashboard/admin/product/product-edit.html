@@ -1,0 +1,167 @@
+{% extends 'dashboard/admin/base.html' %}
+
+{% block extra_css %}
+
+<!-- Virtual Select -->
+
+<style>
+    .small-primary-button {
+        padding: 3px 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 10px;
+        border-radius: 5px;
+    }
+
+    .small-primary-button:hover,
+    .small-primary-button:focus {
+        background-color: #0056b3;
+    }
+</style>
+
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-light mb-0">
+        <li class="breadcrumb-item">حساب</li>
+        <li class="breadcrumb-item">داشبورد ادمین</li>
+        <li class="breadcrumb-item">محصولات</li>
+        <li class="breadcrumb-item active" aria-current="page">
+            ویرایش محصول
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<!-- Card -->
+<div class="card">
+    <!-- Header -->
+    <div class="card-header border-bottom">
+        <h5 class="card-header-title">ویرایش/ساخت محصول</h5>
+    </div>
+    <!-- End Header -->
+
+    <!-- Body -->
+    <div class="card-body">
+        <form action="." method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row d-flex">
+                <div class="col-md-6 mb-3">
+                    <label for="id_title">نام محصول</label>
+                    <input type="text" name="title" class="form-control is-valid" id="id_title"
+                        placeholder="نام محصول را وارد کنید" value="{{ form.instance.title }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_slug">
+                        slug محصول <button class="small-primary-button" type="button" onclick="generateSlug()">ساخت
+                            slug</button>
+                    </label>
+                    <input type="text" name="slug" class="form-control is-valid" id="id_slug"
+                        placeholder="slug محصول را وارد کنید" value="{{ form.instance.slug }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_stock">تعداد</label>
+                    <input type="text" name="stock" class="form-control is-valid" id="id_stock"
+                        placeholder="تعداد محصول را وارد کنید" value="{{ form.instance.stock }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_status">وضعیت</label>
+                    <select name="status" class="form-select is-valid" id="id_status">
+                        <option value="1">عدم انتشار</option>
+                        <option value="2">منتشر شده</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3" id="div_category">
+                    <label for="id_category">دسته بندی</label>
+                    <select name="category" class="form-control is-valid p-0 rounded-1" id="id_category" multiple>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="id_price">قیمت</label>
+                    <input type="text" name="price" class="form-control is-valid" id="id_price"
+                        placeholder="قیمت محصول را وارد کنید" value="{{ form.instance.price }}">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="id_discount_percent">درصد تخفیف</label>
+                    <input type="text" name="discount_percent" class="form-control is-valid" id="id_discount_percent"
+                        value="{{ form.instance.discount_percent }}">
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label for="id_brief_description">توضیحات مختصر</label>
+                    <div class="quill-custom">
+                        <textarea name="brief_description" class="form-control is-valid" style="height: 5rem;"
+                            placeholder="توضیحات مختصر محصول را وارد کنید">{{ form.instance.brief_description }}</textarea>
+                    </div>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label for="id_description">توضیحات</label>
+                    <div class="quill-custom">
+                        <textarea name="description" class="form-control is-valid" style="height: 15rem;"
+                            placeholder="توضیحات محصول را وارد کنید">{{ form.instance.description }}</textarea>
+                    </div>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label for="id_image">تصویر محصول</label>
+                    <input type="file" id="id_image" name="image" class="form-control is-valid">
+                </div>
+                <div class=" d-flex pt-5 justify-content-end">
+                    <a class="btn btn-danger ms-3">حذف</a>
+                    <a class="btn btn-secondary ms-3" href="{% url 'dashboard:admin:product-list' %}">بازگشت</a>
+                    <button type="submit" class="btn btn-primary ms-3">ثبت تغییرات</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- End Body -->
+{% endblock %}
+
+<!-- JS Virtual Select-->
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set initial values for status select field
+        var initialStatus = "{{ form.instance.status }}";
+        var statusSelect = document.getElementById('id_status');
+        statusSelect.value = initialStatus
+
+        var initialCategories = [
+            {% for category in form.instance.category.all %}
+                "{{ category.id }}",
+            {% endfor %}
+        ];
+        var categorySelect = document.getElementById('id_category');
+        for (var i = 0; i < categorySelect.options.length; i++) {
+            if (initialCategories.includes(categorySelect.options[i].value)) {
+                categorySelect.options[i].selected = true;
+            }
+        }
+    });
+
+    function generateSlug() {
+        const title = $("#id_title").val();
+        const slug = slugify(title);
+        $("#id_slug").val(slug)
+    }
+
+    function slugify(titleStr) {
+        titleStr = titleStr.replace(/^\s+|\s+$/g, '');
+        titleStr = titleStr.toLowerCase();
+        //persian support
+        titleStr = titleStr.replace(/[^a-z0-9_\s-ءاأإآؤئبتثجحخدذرزسشصضطظعغفقكلمنهويةى]#u/, '')
+            // Collapse whitespace and replace by -
+            .replace(/\s+/g, '-')
+            // Collapse dashes
+            .replace(/-+/g, '-');
+        slugStr = titleStr;
+        return slugStr;
+    }
+</script>
+{% endblock %}

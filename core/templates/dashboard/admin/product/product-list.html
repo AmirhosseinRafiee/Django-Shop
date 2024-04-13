@@ -93,16 +93,16 @@
                             <td>{{object.title}}</td>
                             <td>{% for category in object.category.all %}{{category.title}}{% if not forloop.last %},
                                 {%endif %}{% endfor %}</td>
-                            <td>{{object.discounted_price}}</td>
+                            <td>{{object.price}}</td>
                             <td>{{object.stock}}</td>
                             <td>{% if object.is_published %}<span class="badge bg-success">نشر شده</span>
                                 {% else %}<span class="badge bg-danger">عدم انتشار</span>
                                 {% endif %}
                             </td>
-                            <td>{{object.discount_percent}}</td>
+                            <td>%{{object.discount_percent}}</td>
                             <td>
                                 <a class="btn btn-sm btn-icon btn-ghost-secondary"
-                                    href="./admin-account-products-single.html">
+                                    href="{% url 'dashboard:admin:product-edit' pk=object.pk %}">
                                     <i class="bi-pencil-square"></i>
                                 </a>
                                 <a class="btn btn-sm btn-icon btn-ghost-primary"

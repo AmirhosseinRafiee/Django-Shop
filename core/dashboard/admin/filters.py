@@ -22,8 +22,8 @@ class AdminProductFilter(django_filters.FilterSet):
         ordering_choices = {
             'date': 'created_date',
             '-date': '-created_date',
-            'price': 'discounted_price',
-            '-price': '-discounted_price',
+            'price': 'price',
+            '-price': '-price',
             '-discount_percent': '-discount_percent',
         }
         ordering = self.data.get('order_by', None)
