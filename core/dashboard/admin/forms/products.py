@@ -2,7 +2,7 @@ from django import forms
 from shop.models import ProductModel
 
 
-class AdminProductEditForm(forms.ModelForm):
+class AdminProductForm(forms.ModelForm):
 
     class Meta:
         model = ProductModel
