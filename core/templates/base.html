@@ -89,6 +89,7 @@
                 data-bs-target="#offcanvasNavbarShoppingCart" aria-controls="offcanvasNavbarShoppingCart"
                 {% if request.path == cart_summary_url %} disabled {% endif %}>
                 <i class="bi-basket"></i>
+                <span class="cart-item-count">{{cart|length}}</span>
               </button>
               <!-- End Shopping Cart -->
               {% if request.user.is_authenticated %}
@@ -463,6 +464,7 @@
 
           // Update cart total quantity
           $("#id-cart-length").text(response.cart_total_quantity)
+          $(".cart-item-count").text(response.cart_total_quantity)
 
           var existingItem = $('#product-' + productId);
           // If the product exists, update its quantity and total price
