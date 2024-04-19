@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
@@ -20,10 +20,14 @@ class UserAddressModel(models.Model):
     address = models.CharField(max_length=250)
     state = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
-    zip_code = models.CharField(max_length=50)
+    zip_code = models.CharField(max_length=10, validators=[RegexValidator(
+        r'^\d{10}$', message=_("کد پستی باید ده رقمی باشد"))])
 
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('-updated_date', )
 
 
 class CuponModel(models.Model):
