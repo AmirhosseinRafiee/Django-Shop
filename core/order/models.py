@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+from decimal import Decimal
 
 User = get_user_model()
 
@@ -14,7 +15,7 @@ class OrderStatusType(models.IntegerChoices):
     canceled = 5, _("لغو شده")
 
 
-class UserAddressMode(models.Model):
+class UserAddressModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.CharField(max_length=250)
     state = models.CharField(max_length=50)
@@ -24,17 +25,19 @@ class UserAddressMode(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
+
 class CuponModel(models.Model):
     code = models.CharField(max_length=100)
-    discount_percent = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
-    max_discount_amount = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
+    discount_percent = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)])
+    max_discount_amount = models.DecimalField(
+        max_digits=10, decimal_places=0, default=Decimal('9999999999'))
     max_limit_usage = models.IntegerField(default=10)
     used_by = models.ManyToManyField(User)
 
-    expiration_date = models.DateTimeField(null=True,blank=True)
+    expiration_date = models.DateTimeField(null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
-
 
 
 class OrderModel(models.Model):
@@ -47,7 +50,8 @@ class OrderModel(models.Model):
 
     total_price = models.DecimalField(max_digits=10, decimal_places=0)
     discounted_amount = models.DecimalField(max_digits=10, decimal_places=0)
-    cupon = models.ForeignKey(CuponModel, on_delete=models.PROTECT, null=True, blank=True)
+    cupon = models.ForeignKey(
+        CuponModel, on_delete=models.PROTECT, null=True, blank=True)
     status = models.IntegerField(
         choices=OrderStatusType.choices, default=OrderStatusType.pending.value
     )
@@ -55,12 +59,14 @@ class OrderModel(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
+
 class OrderItemModel(models.Model):
     order = models.ForeignKey(OrderModel, on_delete=models.CASCADE)
     product = models.ForeignKey('shop.ProductModel', on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=0)
-    discount_percent = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    discount_percent = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
