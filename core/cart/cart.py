@@ -130,13 +130,18 @@ class CartSession:
         CartItemModel.objects.filter(cart=cart).exclude(
             product__id__in=self.cart.keys()).delete()
 
-    def update_db(self, user, product_id):
+    def update_db(self, user, product):
         cart, _ = CartModel.objects.get_or_create(user=user)
-        new_quantity = self.cart.get(str(product_id), {'quantity': 0})['quantity']
+        new_quantity = self.cart.get(str(product.id), {'quantity': 0})['quantity']
         if new_quantity == 0:
-            CartItemModel.objects.filter(cart=cart, product=product_id).delete()
+            CartItemModel.objects.filter(cart=cart, product=product).delete()
         else:
-            CartItemModel.objects.filter(cart=cart, product=product_id).update(quantity=new_quantity)
+            # CartItemModel.objects.filter(cart=cart, product=product_id).update(quantity=new_quantity)
+            CartItemModel.objects.update_or_create(
+                cart=cart,
+                product=product,
+                defaults={'quantity': new_quantity}
+            )
 
     def _validate_quantity(self, product_stock, cart_quantity, quantity, overide_quantity):
         if overide_quantity:

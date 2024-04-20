@@ -19,7 +19,7 @@ class SessionAddProductView(View):
                 product = get_object_or_404(ProductModel, status=ProductStatus.publish.value, id=product_id)
                 cart.add(product_id, product.stock, quantity, overide_quantity)
                 if request.user.is_authenticated:
-                    cart.update_db(request.user, product.id)
+                    cart.update_db(request.user, product)
             except ValueError as e:
                 return JsonResponse({"error": str(e)}, status=400)
         return JsonResponse(cart.to_json())
@@ -30,9 +30,10 @@ class SessionRemoveProductView(View):
         cart = CartSession(request.session)
         product_id = request.POST.get('product_id')
         if product_id:
+            product = get_object_or_404(ProductModel, status=ProductStatus.publish.value, id=product_id)
             cart.remove(product_id)
             if request.user.is_authenticated:
-                cart.update_db(request.user, int(product_id))
+                cart.update_db(request.user, product)
         return HttpResponse(status=200)
 
 class SessionClearProductView(View):
