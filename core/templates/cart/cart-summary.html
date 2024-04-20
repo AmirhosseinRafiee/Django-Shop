@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block extra_css %}
+a.disabled {
+    pointer-events: none;
+    cursor: default;
+}
+{% endblock %}
+
 {% block content %}
 <!-- Content -->
 <div class="container content-space-1 content-space-lg-2">
@@ -143,7 +151,7 @@
                             </div>
 
                             <div class="d-grid">
-                                <a class="btn btn-primary btn-lg" href="{% url 'order:checkout' %}">ثبت سفارش</a>
+                                <a class="btn btn-primary btn-lg {% if cart|length == 0 %} disabled  {% endif %}" href="{% url 'order:checkout' %}">ثبت سفارش</a>
                             </div>
                         </form>
                     </div>
