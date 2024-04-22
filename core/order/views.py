@@ -100,7 +100,7 @@ class OrderValidateCuponView(LoginRequiredMixin, HasCustomerAccessPermission, Vi
     def post(self, request, *args, **kwargs):
         code = request.POST.get('code')
         message, status = _('کد تخفیف با موفقیت اعمال شد'), 200
-        data = {'message': message}
+        data = dict()
         try:
             cupon_obj = CuponModel.objects.get(code=code)
         except CuponModel.DoesNotExist:
@@ -119,4 +119,5 @@ class OrderValidateCuponView(LoginRequiredMixin, HasCustomerAccessPermission, Vi
                 price = request.POST.get('price')
                 if price:
                     data['discount_amount'] = cupon_obj.calculate_discount_amount(int(price))
+        data['message'] = message
         return JsonResponse(data=data, status=status)
