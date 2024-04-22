@@ -31,7 +31,7 @@ class UserAddressModel(models.Model):
 
 
 class CuponModel(models.Model):
-    code = models.CharField(max_length=100)
+    code = models.CharField(max_length=100, unique=True, error_messages={'unique': _("تخفیفی با این کد قبلا ساخته شده است")})
     discount_percent = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(100)])
     max_discount_amount = models.DecimalField(
