@@ -1,9 +1,12 @@
 from django import forms
-from .models import UserAddressModel
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from .models import UserAddressModel, CuponModel
 
 
 class CheckOutForm(forms.Form):
-    address = forms.IntegerField(required=True, )
+    address = forms.IntegerField(required=True)
+    cupon = forms.CharField(required=False)
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")
@@ -19,3 +22,26 @@ class CheckOutForm(forms.Form):
             raise forms.ValidationError("Invalid address ID.")
 
         return address_obj
+
+    def clean_cupon(self):
+        code = self.cleaned_data.get('cupon')
+        if not code:
+            return None
+
+        user = self.request.user
+
+        try:
+            cupon_obj = CuponModel.objects.get(code=code)
+        except CuponModel.DoesNotExist:
+            raise forms.ValidationError(_('کد تخفیف اشتباه است'))
+
+        if cupon_obj.used_by.all().count() >= cupon_obj.max_limit_usage:
+            raise forms.ValidationError(_('تعداد کد تخفیف تمام شده است'))
+
+        elif cupon_obj.expiration_date > timezone.now():
+            raise forms.ValidationError(_('کد تخفیف منقصی شده است'))
+
+        elif user in cupon_obj.used_by.all():
+            raise forms.ValidationError(_('این کد تخفیف قبلا توسط شما استفاده شده است'))
+
+        return cupon_obj

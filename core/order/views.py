@@ -1,7 +1,9 @@
-from django.views.generic import TemplateView, FormView
+from django.views.generic import TemplateView, FormView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 from django.contrib import messages
 from django.db import transaction
+from django.utils import timezone
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
@@ -9,7 +11,7 @@ from order.models import UserAddressModel
 from cart.models import CartModel, CartItemModel
 from cart.cart import CartSession
 from .permissions import HasCustomerAccessPermission
-from .models import OrderModel, OrderItemModel
+from .models import OrderModel, OrderItemModel, CuponModel
 from .forms import CheckOutForm
 
 
@@ -66,6 +68,10 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
                 cart_item.quantity * cart_item.product.discount_percent / 100
             total_price += cart_item.product.price * cart_item.quantity
 
+        cupon: CuponModel = cleaned_data['cupon']
+        if cupon:
+            total_price -= cupon.calculate_discount_amount(total_price - discounted_amount)
+            order.cupon = cupon
         order.total_price = total_price
         order.discounted_amount = discounted_amount
 
@@ -88,3 +94,29 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
 
 class OrderCompletedView(LoginRequiredMixin, HasCustomerAccessPermission, TemplateView):
     template_name = 'order/order-completed.html'
+
+class OrderValidateCuponView(LoginRequiredMixin, HasCustomerAccessPermission, View):
+
+    def post(self, request, *args, **kwargs):
+        code = request.POST.get('code')
+        message, status = _('کد تخفیف با موفقیت اعمال شد'), 200
+        data = {'message': message}
+        try:
+            cupon_obj = CuponModel.objects.get(code=code)
+        except CuponModel.DoesNotExist:
+            message, status = _('کد تخفیف وجود ندارد'), 404
+        else:
+            if cupon_obj.used_by.all().count() >= cupon_obj.max_limit_usage:
+                message, status = _('تعداد کد تخفیف تمام شده است'), 403
+
+            elif cupon_obj.expiration_date > timezone.now():
+                message, status = _('کد تخفیف منقصی شده'), 403
+
+            elif request.user in cupon_obj.used_by.all():
+                message, status = _('کد تخفیف قبلا استفاده شده'), 403
+
+            else:
+                price = request.POST.get('price')
+                if price:
+                    data['discount_amount'] = cupon_obj.calculate_discount_amount(int(price))
+        return JsonResponse(data=data, status=status)

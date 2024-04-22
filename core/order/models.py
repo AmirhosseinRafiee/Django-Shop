@@ -35,13 +35,21 @@ class CuponModel(models.Model):
     discount_percent = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(100)])
     max_discount_amount = models.DecimalField(
-        max_digits=10, decimal_places=0, default=Decimal('9999999999'))
+        max_digits=10, decimal_places=0, null=True, blank=True)
     max_limit_usage = models.IntegerField(default=10)
-    used_by = models.ManyToManyField(User)
+    used_by = models.ManyToManyField(User, blank=True)
 
     expiration_date = models.DateTimeField(null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.code
+
+    def calculate_discount_amount(self, total_price):
+        if self.max_discount_amount:
+            return min(round(total_price * Decimal(self.discount_percent / 100)), self.max_discount_amount)
+        return round(total_price * Decimal(self.discount_percent / 100))
 
 
 class OrderModel(models.Model):
