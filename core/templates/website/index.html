@@ -387,20 +387,16 @@
           <h2>اخبار جدید را دریافت کنید</h2>
         </div>
         <!-- End Heading -->
-
-        <form>
           <!-- Input Card -->
           <div class="input-card input-card-pill input-card-sm border mb-3">
             <div class="input-card-form">
-              <label for="subscribeForm" class="form-label visually-hidden">ایمیل را وارد کنید</label>
-              <input type="text" class="form-control form-control-lg" id="subscribeForm"
-                placeholder="ایمیل خود را وارد نمایید" aria-label="ایمیل خود را وارد کنید">
+              <input type="email" class="form-control form-control-lg" id="subscribeForm" name="email"
+                placeholder="ایمیل خود را وارد نمایید" aria-label="ایمیل خود را وارد کنید"
+                pattern="[^\s@]+@[^\s@]+\.[^\s@]+" title="لطفاً یک آدرس ایمیل معتبر وارد کنید" required>
             </div>
-            <button type="button" class="btn btn-primary btn-lg rounded-pill">ثبت نام</button>
+            <button type="button" class="btn btn-primary btn-lg rounded-pill" onclick="subscribeNewsletter()">ثبت نام</button>
           </div>
           <!-- End Input Card -->
-        </form>
-
         <p class="small">می توانید در هر زمانی اشتراک خود را لغو کنید <a href="#">سیاست حفظ حریم خصوصی</a> ما را
           بخوانید</p>
       </div>
@@ -446,3 +442,67 @@
 </div>
 <!-- End Clients -->
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+  function subscribeNewsletter() {
+      emailInput = $('#subscribeForm')
+      email = emailInput.val();
+      if (!email) {
+          Toastify({
+              text: 'لطفاً ایمیل خود را پر کنید',
+              className: 'error',
+              close: true,
+              style: {
+                  background: 'red'
+              }
+          }).showToast();
+          return;
+      }
+      if (!email.match(emailInput.attr('pattern'))) {
+          Toastify({
+              text: 'لطفاً یک آدرس ایمیل معتبر وارد کنید',
+              className: 'error',
+              close: true,
+              style: {
+                  background: 'red'
+              }
+          }).showToast();
+          return;
+      }
+      $.ajax({
+          url: '{% url "ticket:newsletter-subscribe" %}',
+          method: 'POST',
+          data: {
+              email: $('#subscribeForm').val(),
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function (response) {
+              Toastify({
+                  text: response.message,
+                  className: 'info',
+                  close: true,
+                  style: {
+                      background: 'blue'
+                  }
+              }).showToast();
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+              // Extract the error message from the response text if available
+              var errorMessage = "مشکلی پیش آمده لحضاتی دیگر تلاش کنید";
+              if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                  errorMessage = jqXHR.responseJSON.error;
+              }
+              Toastify({
+                  text: errorMessage,
+                  className: 'error',
+                  close: true,
+                  style: {
+                      background: 'red'
+                  }
+              }).showToast();
+          }
+      });
+  }
+</script>
+{% endblock %}
