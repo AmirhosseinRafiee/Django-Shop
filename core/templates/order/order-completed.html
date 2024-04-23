@@ -3,7 +3,7 @@
 
 {% block content %}
 <!-- Content -->
-<div class="container content-space-2 content-space-lg-3">
+<div class="container content-space-3 content-space-lg-5">
     <div class="w-md-75 w-lg-50 text-center mx-md-auto">
         <div class="mb-5">
             <img class="img-fluid" src="{% static 'svg/illustrations/oc-hi-five.svg' %}" alt="Image Description"
@@ -16,7 +16,8 @@
                 یک ایمیل تاییدیه دریافت خواهید کرد.</p>
         </div>
 
-        <a class="btn btn-primary btn-transition rounded-pill px-6" href="{% url 'shop:product-grid' %}">به خرید ادامه دهید</a>
+        <a class="btn btn-primary btn-transition rounded-pill px-6" href="{% url 'shop:product-grid' %}">به خرید ادامه
+            دهید</a>
     </div>
 </div>
 <!-- End Content -->
@@ -31,20 +32,20 @@
                     <span class="text-cap">ثبت نام</span>
                     <h2>اخبار جدید را دریافت کنید</h2>
                 </div>
-                <!-- End Heading -->
 
-                <form>
-                    <!-- Input Card -->
-                    <div class="input-card input-card-pill input-card-sm border mb-3">
-                        <div class="input-card-form">
-                            <label for="subscribeForm" class="form-label visually-hidden">ایمیل را وارد کنید</label>
-                            <input type="text" class="form-control form-control-lg" id="subscribeForm"
-                                placeholder="ایمیل خود را وارد نمایید" aria-label="ایمیل خود را وارد کنید">
-                        </div>
-                        <button type="button" class="btn btn-primary btn-lg rounded-pill">ثبت نام</button>
+                <!-- End Heading -->
+                <!-- Input Card -->
+                <div class="input-card input-card-pill input-card-sm border mb-3">
+                    <div class="input-card-form">
+                        <label for="subscribeForm" class="form-label visually-hidden">ایمیل را وارد کنید</label>
+                        <input type="email" class="form-control form-control-lg" id="subscribeForm" name="email"
+                            placeholder="ایمیل خود را وارد نمایید" aria-label="ایمیل خود را وارد کنید"
+                            pattern="[^\s@]+@[^\s@]+\.[^\s@]+" required title="لطفاً یک آدرس ایمیل معتبر وارد کنید">
                     </div>
-                    <!-- End Input Card -->
-                </form>
+                    <button type="button" class="btn btn-primary btn-lg rounded-pill"
+                        onclick="subscribeNewsletter()">ثبت نام</button>
+                </div>
+                <!-- End Input Card -->
 
                 <p class="small">می توانید در هر زمانی اشتراک خود را لغو کنید <a href="#">سیاست حفظ حریم خصوصی</a> ما را
                     بخوانید</p>
@@ -91,3 +92,67 @@
 </div>
 <!-- End Clients -->
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+    function subscribeNewsletter() {
+        emailInput = $('#subscribeForm')
+        email = emailInput.val();
+        if (!email) {
+            Toastify({
+                text: 'لطفاً ایمیل خود را پر کنید',
+                className: 'info',
+                close: true,
+                style: {
+                    background: 'blue'
+                }
+            }).showToast();
+            return;
+        }
+        if (!email.match(emailInput.attr('pattern'))) {
+            Toastify({
+                text: 'لطفاً یک آدرس ایمیل معتبر وارد کنید',
+                className: 'info',
+                close: true,
+                style: {
+                    background: 'blue'
+                }
+            }).showToast();
+            return;
+        }
+        $.ajax({
+            url: '{% url "ticket:newsletter-subscribe" %}',
+            method: 'POST',
+            data: {
+                email: $('#subscribeForm').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (response) {
+                Toastify({
+                    text: response.message,
+                    className: 'info',
+                    close: true,
+                    style: {
+                        background: 'blue'
+                    }
+                }).showToast();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // Extract the error message from the response text if available
+                var errorMessage = "مشکلی پیش آمده لحضاتی دیگر تلاش کنید";
+                if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                    errorMessage = jqXHR.responseJSON.error;
+                }
+                Toastify({
+                    text: errorMessage,
+                    className: 'error',
+                    close: true,
+                    style: {
+                        background: 'red'
+                    }
+                }).showToast();
+            }
+        });
+    }
+</script>
+{% endblock %}
