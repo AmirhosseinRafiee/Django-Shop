@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load shop_tags %}
+{% load cart_tags %}
 
 {% block content %}
 <!-- Hero -->
@@ -93,7 +94,13 @@
 
       <!-- Heading -->
       <div class="mb-5">
-        <h1 class="h2">{{object.title}}{% if not object.is_published %}<span class="text-danger"> (عدم انتشار)</span>{% endif %}</h1>
+        <h1 class="h2">{{object.title}}
+          {% if not object.is_published %}
+          <span class="text-danger">
+            (عدم انتشار)
+          </span>
+          {% endif %}
+        </h1>
         <p>{{object.brief_description}}</p>
       </div>
       <!-- End Heading -->
@@ -114,36 +121,6 @@
       </div>
       <!-- End Price -->
 
-      <!-- Quantity -->
-      <div class="quantity-counter mb-3">
-        <div class="js-quantity-counter row align-items-center">
-          <div class="col">
-            <span class="d-block small">تعداد را انتخاب کنید</span>
-            <input class="js-result form-control form-control-quantity-counter" type="text" value="1">
-          </div>
-          <!-- End Col -->
-
-          <div class="col-auto">
-            <a class="js-minus btn btn-outline-secondary btn-xs btn-icon rounded-circle" href="javascript:;">
-              <svg width="8" height="2" viewBox="0 0 8 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M0 1C0 0.723858 0.223858 0.5 0.5 0.5H7.5C7.77614 0.5 8 0.723858 8 1C8 1.27614 7.77614 1.5 7.5 1.5H0.5C0.223858 1.5 0 1.27614 0 1Z"
-                  fill="currentColor" />
-              </svg>
-            </a>
-            <a class="js-plus btn btn-outline-secondary btn-xs btn-icon rounded-circle" href="javascript:;">
-              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M4 0C4.27614 0 4.5 0.223858 4.5 0.5V3.5H7.5C7.77614 3.5 8 3.72386 8 4C8 4.27614 7.77614 4.5 7.5 4.5H4.5V7.5C4.5 7.77614 4.27614 8 4 8C3.72386 8 3.5 7.77614 3.5 7.5V4.5H0.5C0.223858 4.5 0 4.27614 0 4C0 3.72386 0.223858 3.5 0.5 3.5H3.5V0.5C3.5 0.223858 3.72386 0 4 0Z"
-                  fill="currentColor" />
-              </svg>
-            </a>
-          </div>
-          <!-- End Col -->
-        </div>
-        <!-- End Row -->
-      </div>
-      <!-- End Quantity -->
 
       <!-- Accordion -->
       <div class="accordion mb-5" id="shopCartAccordion">
@@ -217,8 +194,49 @@
       </div>
       <!-- End Accordion -->
 
+      <!-- Quantity -->
+      <div class="quantity-counter mb-3">
+        <div class="js-quantity-counter row align-items-center">
+          <div class="col">
+            <span class="d-block small">در سبد شما</span>
+            <span class="js-result text-dark" id="quantity-display">
+              {% with product_quantity_in_cart=cart|get_products_quantity_in_cart:object.id %}
+              {% if product_quantity_in_cart != 0 %}
+              {{product_quantity_in_cart}}
+              {% else %}
+              0
+              {% endif %}
+              {% endwith %}
+            </span>
+            <span id="maximum-alert"></span>
+          </div>
+          <!-- End Col -->
+
+          <div class="col-auto">
+            <button class="js-minus btn btn-outline-secondary btn-xs btn-icon rounded-circle" id="minus-button">
+              <svg width="8" height="2" viewBox="0 0 8 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M0 1C0 0.723858 0.223858 0.5 0.5 0.5H7.5C7.77614 0.5 8 0.723858 8 1C8 1.27614 7.77614 1.5 7.5 1.5H0.5C0.223858 1.5 0 1.27614 0 1Z"
+                  fill="currentColor" />
+              </svg>
+            </button>
+            <button class="js-plus btn btn-outline-primary btn-xs btn-icon rounded-circle" id="plus-button">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M4 0C4.27614 0 4.5 0.223858 4.5 0.5V3.5H7.5C7.77614 3.5 8 3.72386 8 4C8 4.27614 7.77614 4.5 7.5 4.5H4.5V7.5C4.5 7.77614 4.27614 8 4 8C3.72386 8 3.5 7.77614 3.5 7.5V4.5H0.5C0.223858 4.5 0 4.27614 0 4C0 3.72386 0.223858 3.5 0.5 3.5H3.5V0.5C3.5 0.223858 3.72386 0 4 0Z"
+                  fill="currentColor" />
+              </svg>
+            </button>
+          </div>
+          <!-- End Col -->
+        </div>
+        <!-- End Row -->
+      </div>
+      <!-- End Quantity -->
+
       <div class="d-grid mb-4">
-        <button type="button" class="btn btn-primary btntransition">افزودن به سبد خرید</button>
+        <button type="button" class="btn btn-primary btntransition" id="addtocart-button">افزودن به سبد
+          خرید</button>
       </div>
 
       <!-- Media -->
@@ -678,4 +696,74 @@
   <!-- End Row -->
 </div>
 <!-- End Review Section -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const initialQuantity = parseInt(document.getElementById('quantity-display').textContent);
+    toggleQuantityAndButton(initialQuantity);
+
+    document.getElementById('minus-button').addEventListener('click', decrementQuantity);
+    document.getElementById('plus-button').addEventListener('click', incrementQuantity);
+    document.getElementById('addtocart-button').addEventListener('click', incrementQuantity);
+  });
+  // Function to toggle visibility of quantity input and "افزودن به سبد خرید" button
+  function toggleQuantityAndButton(quantity) {
+    const quantityCounter = document.querySelector('.quantity-counter');
+    const addToCartButton = document.querySelector('.btntransition');
+    if (quantity === 0) {
+      // If quantity is zero, show "افزودن به سبد خرید" button and hide quantity input
+      quantityCounter.style.display = 'none';
+      addToCartButton.style.display = 'block';
+    } else {
+      // If quantity is not zero, show quantity input and hide "افزودن به سبد خرید" button
+      quantityCounter.style.display = 'block';
+      addToCartButton.style.display = 'none';
+      var buttonPlus = document.getElementById("plus-button");
+      var MaximumAlertSpan = document.getElementById("maximum-alert");
+      if (quantity === {{ object.stock }}) {
+      buttonPlus.disabled = true;
+      MaximumAlertSpan.textContent = '(حداکثر)';
+      } else {
+        buttonPlus.disabled = false;
+        MaximumAlertSpan.textContent = '';
+      }
+    }
+  }
+  // Function to increment quantity and update product input quantity
+  async function incrementQuantity() {
+    productId = '{{object.id}}';
+    try {
+      // Call addToCart() to increment quantity
+      const newQuantity = await addToCart(productId);
+
+      // Update product input quantity with the new quantity
+      const quantityDisplay = document.getElementById("quantity-display");
+      quantityDisplay.textContent = newQuantity;
+
+      toggleQuantityAndButton(newQuantity);
+    } catch (error) {
+      // Handle errors if any
+      console.error("Error:", error);
+    }
+  }
+  async function decrementQuantity() {
+    productId = '{{object.id}}';
+    try {
+      // Call addToCart() to decrement quantity
+      const newQuantity = await addToCart(productId, -1);
+
+      // Update product input quantity with the new quantity
+      const quantityDisplay = document.getElementById("quantity-display");
+      quantityDisplay.textContent = newQuantity;
+
+      toggleQuantityAndButton(newQuantity);
+    } catch (error) {
+      // Handle errors if any
+      console.error("Error:", error);
+    }
+  }
+</script>
+
 {% endblock %}

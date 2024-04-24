@@ -57,6 +57,9 @@ class CartSession:
         del self.session['cart']
         self.save()
 
+    def get_product_quantity(self, product_id):
+        return self.cart.get(product_id, {'quantity': 0})['quantity']
+
     def to_json(self):
         product_ids = self.cart.keys()
         products = ProductModel.objects.filter(

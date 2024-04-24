@@ -448,98 +448,107 @@
 
 
     function addToCart(productId, quantity = 1, overide_quantity = false) {
-      $.ajax({
-        url: '{% url "cart:session-add-product" %}',
-        method: 'POST',
-        data: {
-          product_id: productId,
-          quantity: quantity,
-          overide_quantity: overide_quantity,
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function (response) {
-          // Update cart total price
-          var final_price_element = $("#cart-total-price");
-          final_price_element.text("قیمت نهایی: " + addCommasToNumber(response.cart_total_price) + " تومان")
+      return new Promise((resolve, reject) => {
+        $.ajax({
+          url: '{% url "cart:session-add-product" %}',
+          method: 'POST',
+          data: {
+            product_id: productId,
+            quantity: quantity,
+            overide_quantity: overide_quantity,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function (response) {
+            // Update cart total price
+            var final_price_element = $("#cart-total-price");
+            final_price_element.text("قیمت نهایی: " + addCommasToNumber(response.cart_total_price) + " تومان")
 
-          // Update cart total quantity
-          $("#id-cart-length").text(response.cart_total_quantity)
-          $(".cart-item-count").text(response.cart_total_quantity)
+            // Update cart total quantity
+            $("#id-cart-length").text(response.cart_total_quantity)
+            $(".cart-item-count").text(response.cart_total_quantity)
 
-          var existingItem = $('#product-' + productId);
-          // If the product exists, update its quantity and total price
-          if (existingItem.length > 0) {
-            if (response.cart.hasOwnProperty(productId)) {
-              var quantityInput = existingItem.find('.quantity input');
-              var totalPriceSpan = existingItem.find('#total-price');
+            var existingItem = $('#product-' + productId);
+            // If the product exists, update its quantity and total price
+            if (existingItem.length > 0) {
+              if (response.cart.hasOwnProperty(productId)) {
+                var quantityInput = existingItem.find('.quantity input');
+                var totalPriceSpan = existingItem.find('#total-price');
 
-              quantityInput.val(response.cart[productId].quantity);
-              totalPriceSpan.text(addCommasToNumber(response.cart[productId].total_price) + " تومان");
+                var newQuantity = response.cart[productId].quantity;
+
+                quantityInput.val(newQuantity);
+                totalPriceSpan.text(addCommasToNumber(response.cart[productId].total_price) + " تومان");
+              } else {
+                $("#product-" + productId).parent().remove();
+                var newQuantity = 0;
+              }
             } else {
-              $("#product-" + productId).parent().remove();
+              // If the product is new, append it to the cart content
+              var newQuantity = response.cart[productId].quantity;
+              var cartContent = $('.cart-content');
+              var newItemHtml = '<div class="border-bottom mb-4">';
+              newItemHtml += '<div class="d-flex" id="product-' + productId + '">';
+              newItemHtml += '<div class="flex-shrink-0">';
+              newItemHtml += '<div class="avatar avatar-lg ms-3">';
+              newItemHtml += '<img class="avatar-img" src="' + response.cart[productId].image_url + '" alt="Image Description">';
+              newItemHtml += '</div>';
+              newItemHtml += '</div>';
+              newItemHtml += '<div class="flex-grow-1">';
+              newItemHtml += '<a class="h5" href="' + response.cart[productId].product_url + '">' + response.cart[productId].title + '</a>';
+              newItemHtml += '<div class="d-grid py-3">';
+              newItemHtml += '<div class="text-body py-1">';
+              newItemHtml += '<div class="d-flex justify-content-start align-items-center">';
+              newItemHtml += '<span class="h6">تعداد:</span>';
+              newItemHtml += '<div class="quantity">';
+              newItemHtml += '<div class="input-group input-group-sm quantity-selector px-5">';
+              newItemHtml += '<button type="button" class="btn btn-sm btn-icon btn-outline-primary" onclick="addToCart(\'' + productId + '\')">';
+              newItemHtml += '<i class="bi-plus"></i>';
+              newItemHtml += '</button>';
+              newItemHtml += '<input type="number" class="form-control" id="quantity-' + productId + '" value="' + newQuantity + '" min="1" max="10">';
+              newItemHtml += '<button type="button" class="btn btn-sm btn-icon btn-outline-danger"  onclick="addToCart(\'' + productId + '\', -1)">';
+              newItemHtml += '<i class="bi-dash"></i>';
+              newItemHtml += '</button>';
+              newItemHtml += '</div>';
+              newItemHtml += '</div>';
+              newItemHtml += '</div>';
+              newItemHtml += '</div>';
+              newItemHtml += '<div class="text-body py-1">';
+              newItemHtml += '<div class="d-flex justify-content-start  align-items-center">';
+              newItemHtml += '<span class="h6">قیمت:</span>';
+              newItemHtml += '<span class="px-5" id="total-price">' + addCommasToNumber(response.cart[productId].total_price) + ' تومان</span>';
+              newItemHtml += '</div>';
+              newItemHtml += '</div>';
+              newItemHtml += '</div>';
+              newItemHtml += '</div>';
+              newItemHtml += '</div>';
+              cartContent.append(newItemHtml);
             }
-          } else {
-            // If the product is new, append it to the cart content
-            var cartContent = $('.cart-content');
-            var newItemHtml = '<div class="border-bottom mb-4">';
-            newItemHtml += '<div class="d-flex" id="product-' + productId + '">';
-            newItemHtml += '<div class="flex-shrink-0">';
-            newItemHtml += '<div class="avatar avatar-lg ms-3">';
-            newItemHtml += '<img class="avatar-img" src="' + response.cart[productId].image_url + '" alt="Image Description">';
-            newItemHtml += '</div>';
-            newItemHtml += '</div>';
-            newItemHtml += '<div class="flex-grow-1">';
-            newItemHtml += '<a class="h5" href="' + response.cart[productId].product_url + '">' + response.cart[productId].title + '</a>';
-            newItemHtml += '<div class="d-grid py-3">';
-            newItemHtml += '<div class="text-body py-1">';
-            newItemHtml += '<div class="d-flex justify-content-start align-items-center">';
-            newItemHtml += '<span class="h6">تعداد:</span>';
-            newItemHtml += '<div class="quantity">';
-            newItemHtml += '<div class="input-group input-group-sm quantity-selector px-5">';
-            newItemHtml += '<button type="button" class="btn btn-sm btn-icon btn-outline-primary" onclick="addToCart(\'' + productId + '\')">';
-            newItemHtml += '<i class="bi-plus"></i>';
-            newItemHtml += '</button>';
-            newItemHtml += '<input type="number" class="form-control" id="quantity-' + productId + '" value="' + response.cart[productId].quantity + '" min="1" max="10">';
-            newItemHtml += '<button type="button" class="btn btn-sm btn-icon btn-outline-danger"  onclick="addToCart(\'' + productId + '\', -1)">';
-            newItemHtml += '<i class="bi-dash"></i>';
-            newItemHtml += '</button>';
-            newItemHtml += '</div>';
-            newItemHtml += '</div>';
-            newItemHtml += '</div>';
-            newItemHtml += '</div>';
-            newItemHtml += '<div class="text-body py-1">';
-            newItemHtml += '<div class="d-flex justify-content-start  align-items-center">';
-            newItemHtml += '<span class="h6">قیمت:</span>';
-            newItemHtml += '<span class="px-5" id="total-price">' + addCommasToNumber(response.cart[productId].total_price) + ' تومان</span>';
-            newItemHtml += '</div>';
-            newItemHtml += '</div>';
-            newItemHtml += '</div>';
-            newItemHtml += '</div>';
-            newItemHtml += '</div>';
-            cartContent.append(newItemHtml);
-          }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          // Extract the error message from the response text if available
-          var errorMessage = "";
-          if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
-            errorMessage = jqXHR.responseJSON.error;
-          } else {
-            // If no specific error message is returned, use a generic error message
-            errorMessage = "An error occurred while processing your request.";
-          }
+            resolve(newQuantity); // Resolve with the new quantity
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            // Extract the error message from the response text if available
+            var errorMessage = "";
+            if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+              errorMessage = jqXHR.responseJSON.error;
+            } else {
+              // If no specific error message is returned, use a generic error message
+              errorMessage = "An error occurred while processing your request.";
+            }
 
-          Toastify({
-            text: errorMessage,
-            className: 'error',
-            close: true,
-            style: {
-              background: 'red'
-            }
-          }).showToast();
-        }
+            Toastify({
+              text: errorMessage,
+              className: 'error',
+              close: true,
+              style: {
+                background: 'red'
+              }
+            }).showToast();
+            reject(errorThrown); // Reject with the error message
+          }
+        });
       });
     }
+
     document.addEventListener("DOMContentLoaded", function () {
       let priceElements = document.querySelectorAll('.formatted-price');
       priceElements.forEach(element => {
