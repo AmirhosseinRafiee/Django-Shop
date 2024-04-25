@@ -208,7 +208,7 @@ customColorPalette = [
 ]
 # CKEditor Settings
 # CKEDITOR_5_CUSTOM_CSS = 'static/django_ckeditor_5/dist/styles.css'  # optional
-CKEDITOR_5_FILE_STORAGE = "core.storage.CustomStorage"  # optional
+CKEDITOR_5_FILE_STORAGE = "dashboard.admin.storage.CustomStorage"  # optional
 CKEDITOR_5_CONFIGS = {
     'default': {
         'toolbar': ['heading', '|', 'bold', 'italic', 'link',
