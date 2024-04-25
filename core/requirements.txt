@@ -1,5 +1,6 @@
 asgiref==3.8.1
 Django==4.2.11
+django-ckeditor-5==0.2.12
 django-debug-toolbar==4.3.0
 django-filter==24.2
 Faker==24.4.0

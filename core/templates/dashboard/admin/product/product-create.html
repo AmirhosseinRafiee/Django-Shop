@@ -20,7 +20,7 @@
         background-color: #0056b3;
     }
 </style>
-
+{{ form.media }}
 {% endblock %}
 
 {% block breadcrumb %}
@@ -103,8 +103,7 @@
                 <div class="col-md-12 mb-3">
                     <label for="id_description">توضیحات</label>
                     <div class="quill-custom">
-                        <textarea name="description" class="form-control is-valid" style="height: 15rem;"
-                            placeholder="توضیحات محصول را وارد کنید">{{ form.instance.description|default:''}}</textarea>
+                        {{form.description}}
                     </div>
                 </div>
                 <div class="col-md-12 mb-3">

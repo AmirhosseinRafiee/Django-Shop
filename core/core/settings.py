@@ -21,12 +21,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KRY', default='django-insecure-@t*7y&_uv!=@-440@s-)1cm_f97l1=bd+wc7vgg)_1)t43x$2^')
+SECRET_KEY = config(
+    'SECRET_KRY', default='django-insecure-@t*7y&_uv!=@-440@s-)1cm_f97l1=bd+wc7vgg)_1)t43x$2^')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool, default=True)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda x: [item.strip() for item in x.split()], default='*')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda x: [
+                       item.strip() for item in x.split()], default='*')
 
 
 # Application definition
@@ -40,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django_filters',
+    'django_ckeditor_5',
 
     'dashboard',
     'accounts',
@@ -138,7 +141,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STATICFILES_DIRS = [
-    BASE_DIR /  'static'
+    BASE_DIR / 'static'
 ]
 
 # Default primary key field type
@@ -147,7 +150,8 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email configuratuins
-EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_BACKEND = config(
+    'EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = config('EMAIL_HOST', default='mailhog')
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool, default=False)
 EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool, default=False)
@@ -156,7 +160,8 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 
 # django debug toolbar for docker usage
-SHOW_DEBUGGER_TOOLBAR = config("SHOW_DEBUGGER_TOOLBAR", cast=bool, default=True)
+SHOW_DEBUGGER_TOOLBAR = config(
+    "SHOW_DEBUGGER_TOOLBAR", cast=bool, default=True)
 if SHOW_DEBUGGER_TOOLBAR:
     INSTALLED_APPS += [
         "debug_toolbar",
@@ -166,11 +171,107 @@ if SHOW_DEBUGGER_TOOLBAR:
     ]
     import socket  # only if you haven't already imported this
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
+    INTERNAL_IPS = [
+        ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
 
 # accounts model settings
 AUTH_USER_MODEL = 'accounts.User'
 
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL= '/'
+LOGOUT_REDIRECT_URL = '/'
 
+customColorPalette = [
+    {
+        'color': 'hsl(4, 90%, 58%)',
+        'label': 'Red'
+    },
+    {
+        'color': 'hsl(340, 82%, 52%)',
+        'label': 'Pink'
+    },
+    {
+        'color': 'hsl(291, 64%, 42%)',
+        'label': 'Purple'
+    },
+    {
+        'color': 'hsl(262, 52%, 47%)',
+        'label': 'Deep Purple'
+    },
+    {
+        'color': 'hsl(231, 48%, 48%)',
+        'label': 'Indigo'
+    },
+    {
+        'color': 'hsl(207, 90%, 54%)',
+        'label': 'Blue'
+    },
+]
+# CKEditor Settings
+# CKEDITOR_5_CUSTOM_CSS = 'static/django_ckeditor_5/dist/styles.css'  # optional
+CKEDITOR_5_FILE_STORAGE = "core.storage.CustomStorage"  # optional
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': ['heading', '|', 'bold', 'italic', 'link',
+                    'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
+        'language': 'fa',
+    },
+    'extends': {
+        'blockToolbar': [
+            'paragraph', 'heading1', 'heading2', 'heading3',
+            '|',
+            'bulletedList', 'numberedList',
+            '|',
+            'blockQuote',
+        ],
+        'toolbar': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
+                    'code', 'subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
+                    'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
+                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
+                    'insertTable',],
+        'image': {
+            'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
+                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
+            'styles': [
+                'full',
+                'side',
+                'alignLeft',
+                'alignRight',
+                'alignCenter',
+            ]
+
+        },
+        'table': {
+            'contentToolbar': ['tableColumn', 'tableRow', 'mergeTableCells',
+                               'tableProperties', 'tableCellProperties'],
+            'tableProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            },
+            'tableCellProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            }
+        },
+        'heading': {
+            'options': [
+                   {'model': 'paragraph', 'title': 'Paragraph',
+                    'class': 'ck-heading_paragraph'},
+                   {'model': 'heading1', 'view': 'h1',
+                    'title': 'Heading 1', 'class': 'ck-heading_heading1'},
+                   {'model': 'heading2', 'view': 'h2',
+                    'title': 'Heading 2', 'class': 'ck-heading_heading2'},
+                   {'model': 'heading3', 'view': 'h3',
+                    'title': 'Heading 3', 'class': 'ck-heading_heading3'}
+            ]
+        },
+        'language': 'fa',
+    },
+    'list': {
+        'properties': {
+            'styles': 'true',
+            'startIndex': 'true',
+            'reversed': 'true',
+        },
+        'language': 'fa',
+    }
+}

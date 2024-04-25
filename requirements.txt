@@ -3,6 +3,7 @@ django >4.2,<4.3
 python-decouple
 pillow
 django-filter
+django-ckeditor-5
 
 # develpment
 django-debug-toolbar
