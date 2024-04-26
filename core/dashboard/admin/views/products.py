@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django_ckeditor_5.views import UploadFileForm, NoImageException, image_verify, handle_uploaded_file
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
-from shop.models import ProductModel, ProductCategoryModel
+from shop.models import ProductModel, ProductCategoryModel, ProductImageModel
 from ..forms import AdminProductForm
 from ..filters import AdminProductFilter
 from ...permissions import AdminAccessPermission
@@ -41,12 +41,16 @@ class AdminProductCreateView(LoginRequiredMixin, AdminAccessPermission, SuccessM
 
 class AdminProductEditView(LoginRequiredMixin, AdminAccessPermission, SuccessMessageMixin, UpdateView):
     template_name = 'dashboard/admin/product/product-edit.html'
-    queryset = ProductModel.objects.all()
+    queryset = ProductModel.objects.all().prefetch_related('productimagemodel_set')
     form_class = AdminProductForm
     extra_context = {'categories': ProductCategoryModel.objects.all()}
     success_url = reverse_lazy('dashboard:admin:product-list')
     success_message = _('بروزرسانی محصول با موفقیت انجام شد')
 
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['extra_images'] = self.object.productimagemodel_set.all()
+        return initial
 
 class AdminProductDeleteView(LoginRequiredMixin, AdminAccessPermission, SuccessMessageMixin, DeleteView):
     template_name = 'dashboard/admin/product/product-delete.html'
@@ -67,3 +71,13 @@ class CkeditorUploadFile(LoginRequiredMixin, AdminAccessPermission, View):
             url = handle_uploaded_file(request.FILES["upload"])
             return JsonResponse({"url": url})
         return JsonResponse({"error": form.errors.get_json_data()})
+
+class AdminDeleteExtraImage(LoginRequiredMixin, AdminAccessPermission, View):
+
+    def post(self, request, *args, **kwargs):
+        image_id = request.POST.get("image_id")
+        try:
+            ProductImageModel.objects.get(id=image_id).delete()
+        except ProductImageModel.DoesNotExist:
+            return JsonResponse(data={'error': _('همچین تصویری وجود ندارد')}, status=404)
+        return JsonResponse(data={'message': _('تصویر با موفقیت حذف شد')}, status=200)

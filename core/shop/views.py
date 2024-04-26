@@ -35,4 +35,4 @@ class ShopProductGridView(ListView):
 
 class ShopProductDetailView(IsAdminOrPublishedPermission, DetailView):
     template_name = 'shop/product-detail.html'
-    queryset = ProductModel.objects.all()
+    queryset = ProductModel.objects.all().prefetch_related('productimagemodel_set')

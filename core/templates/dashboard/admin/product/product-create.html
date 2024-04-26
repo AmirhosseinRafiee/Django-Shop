@@ -79,7 +79,7 @@
                     <label for="id_category">دسته بندی</label>
                     <select name="category" class="form-control is-valid p-0 rounded-1" id="id_category" multiple>
                         {% for category in categories %}
-                            <option value="{{ category.id }}">{{ category.title }}</option>
+                        <option value="{{ category.id }}">{{ category.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -91,7 +91,7 @@
                 <div class="col-md-2 mb-3">
                     <label for="id_discount_percent">درصد تخفیف</label>
                     <input type="text" name="discount_percent" class="form-control is-valid" id="id_discount_percent"
-                    value="{{ form.instance.discount_percent|default:'' }}">
+                        value="{{ form.instance.discount_percent|default:'' }}">
                 </div>
                 <div class="col-md-12 mb-3">
                     <label for="id_brief_description">توضیحات مختصر</label>
@@ -106,9 +106,21 @@
                         {{form.description}}
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_image">تصویر محصول</label>
+                        <input type="file" id="id_image" name="image" class="form-control is-valid">
+                    </div>
+                    <div class="col-md-6 mb-3" id="div-image">
+
+                    </div>
+                </div>
                 <div class="col-md-12 mb-3">
-                    <label for="id_image">تصویر محصول</label>
-                    <input type="file" id="id_image" name="image" class="form-control is-valid">
+                    <label for="id_extra_images">تصاویر بیشتر محصول</label>
+                    <input type="file" id="id_extra_images" name="extra_images" class="form-control is-valid"
+                        accept="image/jpeg, image/jpg, image/png" multiple="multiple">
+                </div>
+                <div class="row" id="extra-images-wrapper">
                 </div>
                 <div class=" d-flex pt-5 justify-content-end">
                     <a class="btn btn-secondary ms-3" href="{% url 'dashboard:admin:product-list' %}">بازگشت</a>
@@ -128,6 +140,57 @@
         var initialStatus = "{{ form.instance.status }}";
         var statusSelect = document.getElementById('id_status');
         statusSelect.value = initialStatus
+    });
+
+    document.getElementById('id_image').addEventListener('change', function (event) {
+        // Check if the div exists, and remove it if it does
+        existingImage = document.getElementById('image_preview');
+        if (existingImage) {
+            existingImage.remove();
+        }
+
+        var file = event.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var container = `<img class="img-thumbnail" id="image_preview" src="${e.target.result}" alt="Preview Image">`;
+                $('#div-image').append(container);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('id_extra_images').addEventListener('change', function (event) {
+        // Remove all elements with the class "extra-image"
+        var extraImages = document.querySelectorAll('.extra-image');
+        extraImages.forEach(function (element) {
+            element.remove();
+        });
+
+        var files = event.target.files;
+
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                // Create a container for each image
+                var container = document.createElement('div');
+                container.classList.add('col-md-2');
+                container.classList.add('mb-2');
+                container.classList.add('extra-image'); // Add a class for styling
+                container.innerHTML = `
+                    <div class="image-container">
+                        <img src="${e.target.result}" alt="Preview Extra Image" class="img-fluid">
+                    </div>
+                `;
+
+                // Append the container to the images wrapper
+                document.getElementById('extra-images-wrapper').appendChild(container);
+            }
+
+            reader.readAsDataURL(file);
+        }
     });
 
     function generateSlug() {

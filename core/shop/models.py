@@ -77,7 +77,7 @@ class ProductModel(models.Model):
         return self.status == ProductStatus.publish.value
 
 class ProductImageModel(models.Model):
-    proudct = models.ForeignKey('ProductModel', on_delete=models.CASCADE)
+    product = models.ForeignKey('ProductModel', on_delete=models.CASCADE)
     file = models.ImageField(upload_to='product/extra-img/')
 
     created_date = models.DateTimeField(auto_now_add=True)

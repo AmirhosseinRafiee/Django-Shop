@@ -19,6 +19,11 @@
     .small-primary-button:focus {
         background-color: #0056b3;
     }
+
+    .image-container {
+        position: relative;
+        display: inline-block;
+    }
 </style>
 {{form.media}}
 {% endblock %}
@@ -42,8 +47,8 @@
     <!-- Header -->
     <div class="card-header border-bottom d-flex justify-content-between align-items-center">
         <h5 class="card-header-title">ویرایش محصول</h5>
-        <a class="btn btn-sm btn-primary" target="_blank"
-        href="{% url 'shop:product-detail' slug=object.slug %}">نمایش محصول</a>
+        <a class="btn btn-sm btn-primary" target="_blank" href="{% url 'shop:product-detail' slug=object.slug %}">نمایش
+            محصول</a>
     </div>
     <!-- End Header -->
 
@@ -81,7 +86,7 @@
                     <label for="id_category">دسته بندی</label>
                     <select name="category" class="form-control is-valid p-0 rounded-1" id="id_category" multiple>
                         {% for category in categories %}
-                            <option value="{{ category.id }}">{{ category.title }}</option>
+                        <option value="{{ category.id }}">{{ category.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -108,18 +113,44 @@
                         {{form.description}}
                     </div>
                 </div>
-                <div class="col-md-12 mb-3">
-                    <label for="id_image">تصویر محصول</label>
-                    <input type="file" id="id_image" name="image" class="form-control is-valid">
-                </div>
-                <div class=" d-flex pt-5 justify-content-end">
-                    <a class="btn btn-danger ms-3" href="{% url 'dashboard:admin:product-delete' pk=object.pk %}">حذف</a>
-                    <a class="btn btn-secondary ms-3" href="{% url 'dashboard:admin:product-list' %}">بازگشت</a>
-                    <button type="submit" class="btn btn-primary ms-3">ثبت تغییرات</button>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_image">تصویر محصول</label>
+                        <input type="file" id="id_image" name="image" class="form-control is-valid">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <img class="img-thumbnail" id="image_preview" src="{{form.image.value.url}}"
+                            alt="Preview Image">
+                    </div>
                 </div>
             </div>
-        </form>
+            <div class="col-md-12 mb-3">
+                <label for="id_extra_images">تصاویر بیشتر محصول</label>
+                <input type="file" id="id_extra_images" name="extra_images" class="form-control is-valid"
+                    accept="image/jpeg, image/jpg, image/png" multiple="multiple">
+            </div>
+            <div class="row" id="extra-images-wrapper">
+                {% for f in form.extra_images.value %}
+                <div class="col-md-2 mb-2" id="extra-image-{{f.id}}">
+                    <div class="image-container">
+                        <button type="button"
+                            class="btn btn-sm btn-icon btn-danger position-absolute top-0 start-0 h-25 w-25"
+                            aria-label="Close" onclick="deleteExtraImage(`{{f.id}}`)">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <img src="{{f.file.url}}" alt="Image {{forloop.counter}}" class="img-fluid">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class=" d-flex pt-5 justify-content-end">
+                <a class="btn btn-danger ms-3" href="{% url 'dashboard:admin:product-delete' pk=object.pk %}">حذف</a>
+                <a class="btn btn-secondary ms-3" href="{% url 'dashboard:admin:product-list' %}">بازگشت</a>
+                <button type="submit" class="btn btn-primary ms-3">ثبت تغییرات</button>
+            </div>
     </div>
+    </form>
+</div>
 </div>
 <!-- End Body -->
 {% endblock %}
@@ -136,20 +167,109 @@
         var initialCategories = [
             {% for category in form.instance.category.all %}
                 "{{ category.id }}",
-            {% endfor %}
+        {% endfor %}
         ];
-        var categorySelect = document.getElementById('id_category');
-        for (var i = 0; i < categorySelect.options.length; i++) {
-            if (initialCategories.includes(categorySelect.options[i].value)) {
-                categorySelect.options[i].selected = true;
+    var categorySelect = document.getElementById('id_category');
+    for (var i = 0; i < categorySelect.options.length; i++) {
+        if (initialCategories.includes(categorySelect.options[i].value)) {
+            categorySelect.options[i].selected = true;
+        }
+    }
+    });
+
+    document.getElementById('id_image').addEventListener('change', function (event) {
+        var file = event.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                document.getElementById('image_preview').src = e.target.result;
             }
+            reader.readAsDataURL(file);
+        } else {
+            // If no file selected, revert image source
+            document.getElementById('image_preview').src = '{{form.image.value.url}}';
         }
     });
+
+    document.getElementById('id_extra_images').addEventListener('change', function (event) {
+        // Remove all elements with the class "extra-image"
+        var extraImages = document.querySelectorAll('.extra-image');
+        extraImages.forEach(function (element) {
+            element.remove();
+        });
+
+        var files = event.target.files;
+
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                // Create a container for each image
+                var container = document.createElement('div');
+                container.classList.add('col-md-2');
+                container.classList.add('mb-2');
+                container.classList.add('extra-image'); // Add a class for styling
+                container.innerHTML = `
+                    <div class="image-container">
+                        <img src="${e.target.result}" alt="Preview Extra Image" class="img-fluid">
+                    </div>
+                `;
+                // Append the container to the images wrapper
+                document.getElementById('extra-images-wrapper').appendChild(container);
+            }
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function deleteExtraImage(imageId) {
+        $.ajax({
+            url: '{% url "dashboard:admin:delete-extra-image" %}',
+            method: 'POST',
+            data: {
+                image_id: imageId,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (response) {
+                $('#extra-image-' + imageId).remove();
+
+                Toastify({
+                    text: response.message,
+                    className: 'info',
+                    close: true,
+                    style: {
+                        background: 'blue'
+                    }
+                }).showToast();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // Extract the error message from the response text if available
+                var errorMessage = "";
+                if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                    errorMessage = jqXHR.responseJSON.error;
+                } else {
+                    // If no specific error message is returned, use a generic error message
+                    errorMessage = "An error occurred while processing your request.";
+                }
+
+                Toastify({
+                    text: errorMessage,
+                    className: 'error',
+                    close: true,
+                    style: {
+                        background: 'red'
+                    }
+                }).showToast();
+            }
+        });
+    }
 
     function generateSlug() {
         const title = $("#id_title").val();
         const slug = slugify(title);
-        $("#id_slug").val(slug)
+        $("#id_slug").val(slug);
     }
 
     function slugify(titleStr) {

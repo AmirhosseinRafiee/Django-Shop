@@ -6,4 +6,5 @@ urlpatterns = [
     path('create/', views.AdminProductCreateView.as_view(), name='product-create'),
     path('edit/<int:pk>/', views.AdminProductEditView.as_view(), name='product-edit'),
     path('delete/<int:pk>/', views.AdminProductDeleteView.as_view(), name='product-delete'),
+    path('delete/extra-image/', views.AdminDeleteExtraImage.as_view(), name='delete-extra-image'),
 ]
