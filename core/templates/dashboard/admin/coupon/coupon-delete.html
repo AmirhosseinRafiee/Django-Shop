@@ -1,0 +1,51 @@
+{% extends 'dashboard/admin/base.html' %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-light mb-0">
+        <li class="breadcrumb-item">حساب</li>
+        <li class="breadcrumb-item">داشبورد ادمین</li>
+        <li class="breadcrumb-item">تخفیف ها</li>
+        <li class="breadcrumb-item active" aria-current="page">
+            حذف تخفیف
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<!-- Card -->
+<div class="card">
+    <!-- Header -->
+    <div class="card-header border-bottom">
+        <h5 class="card-header-title">حذف تخفیف</h5>
+    </div>
+    <!-- End Header -->
+
+    <!-- Body -->
+    <!-- Body -->
+    <div class="card-body">
+    <form action="." method="post">
+        {% csrf_token %}
+        <div class="card-body">
+            <div class="row d-flex ">
+                <p> آیا از حذف تخفیف زیر اطمینان دارید؟</p>
+                <div class="row">
+                     <span>شناسه تخفیف  : {{object.pk}}</span>
+                     <span>کد تخفیف  : {{object.code}}</span>
+                     <span>درصد تخفیف  : {{object.discount_percent}}</span>
+                </div>
+
+            </div>
+            <div class="card-footer">
+                <div class=" d-flex pt-5 justify-content-end">
+                    <button type="submit" class="btn btn-danger ms-3">تایید حذف</button>
+                    <a class="btn btn-secondary ms-3" href="{% url 'dashboard:admin:coupon-edit' pk=object.pk %}">بازگشت</a>
+                </div>
+            </div>
+    </form>
+    </div>
+
+</div>
+<!-- End Body -->
+{% endblock %}
