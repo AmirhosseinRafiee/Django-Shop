@@ -15,7 +15,7 @@ class AdminDashboradUserListView(LoginRequiredMixin, AdminAccessPermission, List
         return self.request.GET.get('page_size', self.paginate_by)
 
     def get_queryset(self):
-        qs = User.objects.prefetch_related('profile')
+        qs = User.objects.select_related('profile')
         if email := self.request.GET.get('email'):
             qs = qs.filter(email__icontains=email)
         return qs

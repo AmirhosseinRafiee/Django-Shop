@@ -4,9 +4,9 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb breadcrumb-light mb-0">
         <li class="breadcrumb-item">حساب</li>
-        <li class="breadcrumb-item">داشبورد ادمین</li>
+        <li class="breadcrumb-item">تخفیف ها</li>
         <li class="breadcrumb-item active" aria-current="page">
-            تخفیف ها
+            استفاده کنندگان تخفیف
         </li>
     </ol>
 </nav>
@@ -18,8 +18,8 @@
     <!-- Header -->
     <div class="card-header border-bottom">
         <div class="d-flex justify-content-between align-items-center">
-            <h5 class="">لیست تخفیف ها</h5>
-            <a class="btn btn-primary" href="{% url 'dashboard:admin:coupon-create' %}">ایجاد تخفیف</a>
+            <h5 class="card-header-title">لیست استفاده کنندگان تخفیف</h5>
+            <a class="btn btn-primary" href="{{ request.META.HTTP_REFERER }}">بازگشت</a>
         </div>
     </div>
     <!-- End Header -->
@@ -28,29 +28,14 @@
     <div class="card-body">
         <div class="container pb-5">
             <form action="." class="row">
-                <!-- Input Card -->
-                <div class="col-md-5 py-1">
-                    <input type="text" class="form-control form-control-sm" placeholder="جستجوی" aria-label="جستجوی"
-                        name="q" id="search-query-filter">
 
+                <!-- Input Card -->
+                <div class="col-md-8 py-1">
+                    <input type="text" class="form-control" name="email" placeholder="جستجوی ایمیل" aria-label="جستجوی ایمیل">
                 </div>
                 <!-- End Input Card -->
-                <div class="col-md-4 py-1">
-                    <select class="form-select form-select-sm" name="order_by" id="order-by-filter">
-                        <option value="" selected>مرتب سازی</option>
-                        <option value="-date">جدیدترین</option>
-                        <option value="date">قدیمی ترین</option>
-                        <option value="discount_percent">کمترین درصد تخفیف</option>
-                        <option value="-discount_percent">بیش ترین درصد تخفیف</option>
-                        <option value="-max_discount_amount">بیش ترین مقدار تخفیف</option>
-                        <option value="max_limit_usage">کمترین تعداد</option>
-                        <option value="-max_limit_usage">بیشترین تعداد</option>
-                        <option value="num_users_used">کمترین استفاده</option>
-                        <option value="-num_users_used">بیشترین استفاده</option>
-                    </select>
-                </div>
-                <div class="col-md-2 py-1">
-                    <select class="form-select form-select-sm" name="page_size" id="page-size-filter">
+                <div class="col-md-3 py-1">
+                    <select class="form-select form-select" name="page_size" id="page-size-filter">
                         <option value="" selected>تعداد</option>
                         <option value="5">5</option>
                         <option value="10">10</option>
@@ -73,12 +58,11 @@
                     <thead class="thead-light">
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">کد تخفیف</th>
-                            <th scope="col">درصد تخفیف</th>
-                            <th scope="col">حداکثر تخفیف</th>
-                            <th scope="col">تعداد</th>
-                            <th scope="col">تعداد استفاده</th>
-                            <th scope="col">تاریخ انقضا</th>
+                            <th scope="col">نام</th>
+                            <th scope="col">نام خانوادگی</th>
+                            <th scope="col">ایمیل</th>
+                            <th scope="col">جنسیت</th>
+                            <th scope="col">وضعیت</th>
                             <th scope="col">عملیات</th>
                         </tr>
                     </thead>
@@ -86,21 +70,32 @@
                         {% for object in object_list %}
                         <tr>
                             <th scope="row">{{object.id}}</th>
-                            <td>{{object.code}}</td>
-                            <td>% {{object.discount_percent}}</td>
-                            <td>{{object.max_discount_amount}}</td>
-                            <td>{{object.max_limit_usage}}</td>
-                            <td>{{object.num_users_used}}</td>
-                            <td>{{object.expiration_date|date:"Y-m-d"}}</td>
+                            <td>{{object.profile.first_name}}</td>
+                            <td>{{object.profile.last_name}}</td>
+                            <td>{{object.email}}</td>
+                            <td><span></span>
+                                {% if object.profile.gender == 1 %}
+                                آقا
+                                {% elif object.profile.gender == 2 %}
+                                خانم
+                                {% else %}
+                                نامشخص
+                                {% endif %}</span>
+                            </td>
                             <td>
-                                <a class="btn btn-sm btn-icon btn-ghost-secondary"
-                                    href="{% url 'dashboard:admin:coupon-edit' pk=object.id %}">
-                                    <i class="bi-pencil-square"></i>
-                                </a>
-                                <a class="btn btn-sm btn-icon btn-ghost-primary"
-                                    href="{% url 'dashboard:admin:coupon-used-by' pk=object.id %}">
-                                    <i class="bi-eye"></i>
-                                </a>
+                                {% if object.is_active %}
+                                {% if object.is_verified %}
+                                <span class="badge bg-success">فعال</span>
+                                {% else %}
+                                <span class="badge bg-secondary">تایید نشده</span>
+                                {% endif %}
+                                {% else %}
+                                <span class="badge bg-danger">غیر فعال</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a class="btn btn-sm btn-icon btn-ghost-danger"><i class="bi-trash"></i></a>
+                                <a class="btn btn-sm btn-icon btn-ghost-secondary"><i class="bi-pencil-square"></i></a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -108,13 +103,6 @@
                 </table>
             </div>
             <!-- End Table -->
-            <div class="row m-1 py-0 ">
-                <div class="d-flex justify-content-start">
-                    <div>
-                        {{ paginator.count }} تخفیف
-                    </div>
-                </div>
-            </div>
 
             <!-- Pagination -->
             <div class="row pt-5 mt-3">
@@ -153,8 +141,6 @@
             </div>
             <!-- End Pagination -->
 
-
-
         </div>
         <!-- End Row -->
 
@@ -165,26 +151,16 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- jQuery Script -->
 <script>
     $(document).ready(function () {
         let current_url_params = new URLSearchParams(window.location.search)
         $("#page-size-filter").val(current_url_params.get("page_size") || "")
-        $("#order-by-filter").val(current_url_params.get("order_by") || "")
-        $("#search-query-filter").val(current_url_params.get("q") || "")
+        $("#search-query-filter").val(current_url_params.get("email") || "")
     });
     $('#page-size-filter').change(function () {
         let current_url_params = new URLSearchParams(window.location.search)
         var selectedOption = $(this).val();
         current_url_params.set("page_size", selectedOption)
-        current_url_params.set("page", 1)
-        let new_url = window.location.pathname + "?" + current_url_params.toString()
-        window.location.href = new_url
-    });
-    $('#order-by-filter').change(function () {
-        let current_url_params = new URLSearchParams(window.location.search)
-        var selectedOption = $(this).val();
-        current_url_params.set("order_by", selectedOption)
         current_url_params.set("page", 1)
         let new_url = window.location.pathname + "?" + current_url_params.toString()
         window.location.href = new_url

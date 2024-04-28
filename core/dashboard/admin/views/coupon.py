@@ -1,10 +1,9 @@
-from django.forms import BaseForm
-from django.http import HttpRequest, HttpResponse
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib import messages
 from django.db.models import Count, ProtectedError
+from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -12,6 +11,9 @@ from order.models import CuponModel
 from ...permissions import AdminAccessPermission
 from ..filters import AdminCouponFilter
 from ..forms import AdminCouponForm
+from .users import AdminDashboradUserListView
+
+User = get_user_model()
 
 
 class AdminCouponListView(LoginRequiredMixin, AdminAccessPermission, ListView):
@@ -28,6 +30,7 @@ class AdminCouponListView(LoginRequiredMixin, AdminAccessPermission, ListView):
         qs = super().get_queryset()
         return AdminCouponFilter(self.request.GET, qs).qs
 
+
 class AdminCouponCreateView(LoginRequiredMixin, AdminAccessPermission, SuccessMessageMixin, CreateView):
     template_name = 'dashboard/admin/coupon/coupon-create.html'
     form_class = AdminCouponForm
@@ -35,6 +38,7 @@ class AdminCouponCreateView(LoginRequiredMixin, AdminAccessPermission, SuccessMe
 
     def get_success_url(self):
         return reverse('dashboard:admin:coupon-edit', kwargs={'pk': self.object.pk})
+
 
 class AdminCouponEditView(LoginRequiredMixin, AdminAccessPermission, SuccessMessageMixin, UpdateView):
     template_name = 'dashboard/admin/coupon/coupon-edit.html'
@@ -54,7 +58,22 @@ class AdminCouponDeleteView(LoginRequiredMixin, AdminAccessPermission, SuccessMe
         try:
             self.object.delete()
         except ProtectedError:
-            messages.error(self.request, _("این کوپن نمی‌تواند حذف شود زیرا با سفارش‌های موجود مرتبط است."))
+            messages.error(self.request, _(
+                "این کوپن نمی‌تواند حذف شود زیرا با سفارش‌های موجود مرتبط است."))
             return redirect(reverse('dashboard:admin:coupon-edit', kwargs={'pk': self.object.pk}))
         success_url = self.get_success_url()
         return redirect(success_url)
+
+class AdminCouponUsedByView(LoginRequiredMixin, AdminAccessPermission, ListView):
+    template_name = 'dashboard/admin/coupon/coupon-used-by.html'
+    paginate_by = 10
+
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get('page_size', self.paginate_by)
+
+    def get_queryset(self):
+        coupon_pk = self.kwargs['pk']
+        qs = User.objects.filter(cuponmodel__pk=coupon_pk).select_related('profile')
+        if email := self.request.GET.get('email'):
+            qs = qs.filter(email__icontains=email)
+        return qs

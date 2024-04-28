@@ -152,7 +152,7 @@
     $(document).ready(function () {
         let current_url_params = new URLSearchParams(window.location.search)
         $("#page-size-filter").val(current_url_params.get("page_size") || "")
-        $("#search-query-filter").val(current_url_params.get("q") || "")
+        $("#search-query-filter").val(current_url_params.get("email") || "")
     });
     $('#page-size-filter').change(function () {
         let current_url_params = new URLSearchParams(window.location.search)
