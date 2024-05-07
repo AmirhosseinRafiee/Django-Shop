@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django.contrib.sites',
     'django_filters',
     'django_ckeditor_5',
 
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     'cart',
     'ticket',
     'order',
+    'payment',
 ]
 
 MIDDLEWARE = [
@@ -148,6 +150,9 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# sites configs
+SITE_ID = 1
 
 # Email configuratuins
 EMAIL_BACKEND = config(
@@ -275,3 +280,6 @@ CKEDITOR_5_CONFIGS = {
         'language': 'fa',
     }
 }
+
+# payment configs
+ZARINPAL_MERCHANT_ID = config('ZARINPAL_SANDBOX_MERCHANT_ID', default="1344b5d4-0048-11e8-9aab-005056a205be")

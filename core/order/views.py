@@ -10,6 +10,8 @@ from django.utils.translation import gettext_lazy as _
 from order.models import UserAddressModel
 from cart.models import CartModel, CartItemModel
 from cart.cart import CartSession
+from payment.models import PaymentModel, PaymentClient
+from payment.clients import ZarinPalSandbox
 from .permissions import HasCustomerAccessPermission
 from .models import OrderModel, OrderItemModel, CuponModel
 from .forms import CheckOutForm
@@ -70,7 +72,8 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
 
         cupon: CuponModel = cleaned_data['cupon']
         if cupon:
-            total_price -= cupon.calculate_discount_amount(total_price - discounted_amount)
+            total_price -= cupon.calculate_discount_amount(
+                total_price - discounted_amount)
             order.cupon = cupon
         order.total_price = total_price
         order.discounted_amount = discounted_amount
@@ -80,20 +83,30 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
                 # Save order and order items
                 order.save()
                 OrderItemModel.objects.bulk_create(order_item_list)
+                self.order = order
 
                 # Clear the cart
                 cart_items.delete()
             CartSession(self.request.session).clear()
         except Exception as e:
             # logger.error(f"An error occurred while processing the order: {e}")
-            messages.error(self.request, _("خطایی در هنگام پردازش درخواست شما رخ داد. لطفاً بعداً مجدداً امتحان کنید"))
+            messages.error(self.request, _(
+                "خطایی در هنگام پردازش درخواست شما رخ داد. لطفاً بعداً مجدداً امتحان کنید"))
             return redirect(reverse('order:checkout'))
 
         return super().form_valid(form)
 
+    def get_success_url(self):
+        return reverse('payment:zarinpal-pay', kwargs={'pk': self.order.pk})
+
 
 class OrderCompletedView(LoginRequiredMixin, HasCustomerAccessPermission, TemplateView):
     template_name = 'order/order-completed.html'
+
+
+class OrderFailedView(LoginRequiredMixin, HasCustomerAccessPermission, TemplateView):
+    template_name = 'order/order-failed.html'
+
 
 class OrderValidateCuponView(LoginRequiredMixin, HasCustomerAccessPermission, View):
 
@@ -118,6 +131,7 @@ class OrderValidateCuponView(LoginRequiredMixin, HasCustomerAccessPermission, Vi
             else:
                 price = request.POST.get('price')
                 if price:
-                    data['discount_amount'] = cupon_obj.calculate_discount_amount(int(price))
+                    data['discount_amount'] = cupon_obj.calculate_discount_amount(
+                        int(price))
         data['message'] = message
         return JsonResponse(data=data, status=status)

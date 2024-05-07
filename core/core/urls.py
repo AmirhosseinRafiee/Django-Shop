@@ -29,6 +29,7 @@ urlpatterns = [
     path('shop/', include('shop.urls')),
     path('cart/', include('cart.urls')),
     path('order/', include('order.urls')),
+    path('payment/', include('payment.urls')),
     path("ckeditor5/", CkeditorUploadFile.as_view() , name="ck_editor_5_upload_file"),
 ]
 
