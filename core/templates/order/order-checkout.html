@@ -4,10 +4,14 @@
 {% block extra_css %}
 <style>
   .readonly-input {
-    background-color: #f5f5f5; /* Light gray background */
-    cursor: not-allowed; /* Show cursor as not allowed */
-    color: #555; /* Dark gray text color */
-    pointer-events: none; /* Disable pointer events to prevent user interaction */
+    background-color: #f5f5f5;
+    /* Light gray background */
+    cursor: not-allowed;
+    /* Show cursor as not allowed */
+    color: #555;
+    /* Dark gray text color */
+    pointer-events: none;
+    /* Disable pointer events to prevent user interaction */
   }
 </style>
 {% endblock %}
@@ -16,39 +20,58 @@
 <div class="container content-space-1 content-space-lg-2">
   <div class="row">
     <div class="col-lg-8 mb-7 mb-lg-0">
-      <h4 class="mb-3">انتخاب آدرس </h4>
+      <div class="pb-4 mb-4">
+        <h4 class="mb-3">انتخاب آدرس </h4>
 
-      <!-- Form -->
-      <form action="." method="post" id="checkout-form">
-        {% csrf_token %}
+        <!-- Form -->
+        <form action="." method="post" id="checkout-form">
+          {% csrf_token %}
+          <hr class="my-4">
+
+          <div class="d-grid gap-2">
+            {% for address in addresses %}
+            <!-- Check -->
+            <div class="form-check">
+              <input type="radio" class="form-check-input" name="address" value="{{address.id}}" required>
+              <label class="form-check-label" for="address">{{address.state}}, {{address.city}}, {{address.address}}
+                ,{{address.zip_code}}</label>
+            </div>
+            {% endfor %}
+            <!-- End Check -->
+            <div>
+              <a class="" href="{% url 'dashboard:customer:address-list' %}">مدیریت آدرس ها</a>
+            </div>
+          </div>
+      </div>
+      <div class="pb-4 mb-4">
+        <h4 class="mb-3">انتخاب درگاه پرداخت </h4>
+
         <hr class="my-4">
 
         <div class="d-grid gap-2">
-          {% for address in addresses %}
           <!-- Check -->
           <div class="form-check">
-            <input type="radio" class="form-check-input" name="address" value="{{address.id}}" required>
-            <label class="form-check-label" for="address">{{address.state}}, {{address.city}}, {{address.address}}
-              ,{{address.zip_code}}</label>
+            <input type="radio" class="form-check-input" name="payment" value="1" required checked>
+            <label class="form-check-label" for="address">زرین پال</label>
           </div>
-          {% endfor %}
+          <div class="form-check">
+            <input type="radio" class="form-check-input" name="payment" value="2" required>
+            <label class="form-check-label" for="address">آقای پرداخت</label>
+          </div>
           <!-- End Check -->
-          <div>
-            <a class="" href="{% url 'dashboard:customer:address-list' %}">مدیریت آدرس ها</a>
-          </div>
         </div>
+      </div>
+      <hr class="my-4">
 
-        <hr class="my-4">
-
-        <div class="row align-items-center">
-          <div class="col-sm text-center text-sm-start">
-            <a class="link" href="{% url 'cart:session-cart-summary' %}">
-              بازگشت به سبد خرید <i class="bi-chevron-left small me-1"></i>
-            </a>
-          </div>
-          <!-- End Col -->
+      <div class="row align-items-center">
+        <div class="col-sm text-center text-sm-start">
+          <a class="link" href="{% url 'cart:session-cart-summary' %}">
+            بازگشت به سبد خرید <i class="bi-chevron-left small me-1"></i>
+          </a>
         </div>
-        <!-- End Row -->
+        <!-- End Col -->
+      </div>
+      <!-- End Row -->
       </form>
       <!-- End Form -->
     </div>
@@ -94,7 +117,8 @@
 
               <dl class="row">
                 <dt class="col-sm-6">جمع کل</dt>
-                <dd class="col-sm-6 text-sm-end mb-0 formatted-price" id="total-price" data-cart-total-price="{{cart_total_price}}">{{cart_total_price}}</dd>
+                <dd class="col-sm-6 text-sm-end mb-0 formatted-price" id="total-price"
+                  data-cart-total-price="{{cart_total_price}}">{{cart_total_price}}</dd>
               </dl>
               <!-- End Row -->
             </div>
@@ -174,7 +198,7 @@
         var deleteButton = '<button id="delete-coupon" class="btn btn-outline-danger" onclick="removeCopun()"><i class="bi bi-trash"></i></button>';
         inputCupon.before(deleteButton);
         // Add cupon amount
-        discountCode =  '<dl class="row" id="discount"><dt class="col-sm-6">مقدار کد تخفیف</dt><dd class="col-sm-12 text-sm-end mb-0 formatted-price">';
+        discountCode = '<dl class="row" id="discount"><dt class="col-sm-6">مقدار کد تخفیف</dt><dd class="col-sm-12 text-sm-end mb-0 formatted-price">';
         discountCode += addCommasToNumber(response.discount_amount) + ' تومان';
         discountCode += '</dd></dl>';
         $('#parent-price').append(discountCode);

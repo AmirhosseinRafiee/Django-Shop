@@ -20,7 +20,6 @@ from .forms import CheckOutForm
 class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormView):
     template_name = 'order/order-checkout.html'
     form_class = CheckOutForm
-    success_url = reverse_lazy('order:completed')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -83,7 +82,6 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
                 # Save order and order items
                 order.save()
                 OrderItemModel.objects.bulk_create(order_item_list)
-                self.order = order
 
                 # Clear the cart
                 cart_items.delete()
@@ -94,10 +92,14 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
                 "خطایی در هنگام پردازش درخواست شما رخ داد. لطفاً بعداً مجدداً امتحان کنید"))
             return redirect(reverse('order:checkout'))
 
-        return super().form_valid(form)
+        payment_url_pattern = self._get_payment_pattern(cleaned_data['payment'])
+        return redirect(reverse(payment_url_pattern, kwargs={'pk': order.pk}))
 
-    def get_success_url(self):
-        return reverse('payment:zarinpal-pay', kwargs={'pk': self.order.pk})
+    def _get_payment_pattern(self, payment_val):
+        if payment_val == 1:
+            return 'payment:zarinpal-pay'
+        elif payment_val == 2:
+            return 'payment:aqayepardakht-pay'
 
 
 class OrderCompletedView(LoginRequiredMixin, HasCustomerAccessPermission, TemplateView):

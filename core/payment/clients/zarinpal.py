@@ -1,9 +1,10 @@
 from django.contrib.sites.models import Site
 from django.conf import settings
 import requests
+from .bank import BaseBank
 
 
-class ZarinPalSandbox:
+class ZarinPalSandbox(BaseBank):
     MERCHANT_ID = settings.ZARINPAL_MERCHANT_ID
     CALLBACK_URL = f"http://{Site.objects.get_current().domain}/payment/verify/zp/"
     ZP_API_REQUEST = "https://sandbox.zarinpal.com/pg/rest/WebGate/PaymentRequest.json"
@@ -33,5 +34,5 @@ class ZarinPalSandbox:
         )
         return response.json()
 
-    def get_payment_url(self, authority):
+    def generate_payment_url(self, authority):
         return self.ZP_API_STARTPAY + authority

@@ -4,8 +4,8 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from order.models import OrderModel, OrderStatusType
-from .models import PaymentModel, PaymentStatus, PaymentClient
-from .clients import ZarinPalSandbox
+from ..models import PaymentModel, PaymentStatus, PaymentClient
+from ..clients import ZarinPalSandbox
 
 
 class ZarinpalPayView(View):
@@ -27,7 +27,7 @@ class ZarinpalPayView(View):
             amount=price,
         )
 
-        return redirect(zarinpal_obj.get_payment_url(authority))
+        return redirect(zarinpal_obj.generate_payment_url(authority))
 
 
 class ZarinpalVerifyView(View):

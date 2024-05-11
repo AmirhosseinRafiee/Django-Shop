@@ -8,8 +8,10 @@ class PaymentStatus(models.IntegerChoices):
     success = 2, _("پرداخت موفق")
     failed = 3, _("پرداخت ناموفق")
 
+
 class PaymentClient(models.IntegerChoices):
     zarinpal = 1, _("زرین پال")
+    aqayepardakht = 2, _("آقای پرداخت")
 
 
 class PaymentModel(models.Model):
@@ -28,4 +30,3 @@ class PaymentModel(models.Model):
 
     class Meta:
         unique_together = [['client', 'authority_id']]
-
