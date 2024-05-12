@@ -12,6 +12,7 @@ class PaymentStatus(models.IntegerChoices):
 class PaymentClient(models.IntegerChoices):
     zarinpal = 1, _("زرین پال")
     aqayepardakht = 2, _("آقای پرداخت")
+    payping = 3, _("پی پینگ")
 
 
 class PaymentModel(models.Model):
@@ -21,7 +22,7 @@ class PaymentModel(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=0)
     status = models.IntegerField(
         choices=PaymentStatus.choices, default=PaymentStatus.pending.value)
-    ref_id = models.IntegerField(null=True, blank=True)
+    ref_id = models.CharField(max_length=60, null=True, blank=True)
     response_code = models.IntegerField(null=True, blank=True)
     response_json = models.JSONField(default=dict)
 

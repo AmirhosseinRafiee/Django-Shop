@@ -100,6 +100,8 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
             return 'payment:zarinpal-pay'
         elif payment_val == 2:
             return 'payment:aqayepardakht-pay'
+        elif payment_val == 3:
+            return 'payment:payping-pay'
 
 
 class OrderCompletedView(LoginRequiredMixin, HasCustomerAccessPermission, TemplateView):

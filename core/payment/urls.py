@@ -8,4 +8,6 @@ urlpatterns = [
     path('verify/zp/', views.ZarinpalVerifyView.as_view(), name='zarinpal-verify'),
     path('order/<int:pk>/pay/aq/', views.AqayePardakhtPayView.as_view(), name='aqayepardakht-pay'),
     path('verify/aq/', views.AqayePardakhtVerifyView.as_view(), name='aqayepardakht-verify'),
+    path('order/<int:pk>/pay/pp/', views.PayPingPayView.as_view(), name='payping-pay'),
+    path('verify/pp/', views.PayPingVerifyView.as_view(), name='payping-verify'),
 ]

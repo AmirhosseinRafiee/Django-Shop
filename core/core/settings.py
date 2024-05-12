@@ -284,3 +284,4 @@ CKEDITOR_5_CONFIGS = {
 # payment configs
 ZARINPAL_MERCHANT_ID = config('ZARINPAL_SANDBOX_MERCHANT_ID', default="1344b5d4-0048-11e8-9aab-005056a205be")
 AQAYEPARDAKHT_PIN = config('ZARINPAL_SANDBOX_PIN', default="sandbox")
+PAYPING_TOKEN = config('PAYPING_TOKEN', default="Rfus2gd7n2Em6o8iPhx583-2Bo8g_srkQmxdF2VrLXw")
