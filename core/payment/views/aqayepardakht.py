@@ -1,16 +1,18 @@
 from django.views.generic import View
 from django.http import Http404, HttpResponseBadRequest
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from order.models import OrderModel, OrderStatusType
+from order.permissions import HasCustomerAccessPermission
 from ..models import PaymentModel, PaymentStatus, PaymentClient
 from ..clients import AqayePardakhtSandbox
 
 
-class AqayePardakhtPayView(View):
+class AqayePardakhtPayView(LoginRequiredMixin, HasCustomerAccessPermission, View):
 
     def get(self, request, *args, **kwargs):
         pk = self.kwargs['pk']
@@ -37,7 +39,7 @@ class AqayePardakhtPayView(View):
         return redirect(aqayepardakht_obj.generate_payment_url(transid))
 
 @method_decorator(csrf_exempt, name='dispatch')
-class AqayePardakhtVerifyView(View):
+class AqayePardakhtVerifyView(LoginRequiredMixin, HasCustomerAccessPermission, View):
 
     def post(self, request, *args, **kwargs):
         transid = request.POST.get('transid')

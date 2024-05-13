@@ -1,16 +1,18 @@
 from django.views.generic import View
 from django.http import Http404
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from order.models import OrderModel, OrderStatusType
+from order.permissions import HasCustomerAccessPermission
 from ..models import PaymentModel, PaymentStatus, PaymentClient
 from ..clients import PayPingSandbox
 
 
-class PayPingPayView(View):
+class PayPingPayView(LoginRequiredMixin, HasCustomerAccessPermission, View):
 
     def get(self, request, *args, **kwargs):
         pk = self.kwargs['pk']
@@ -36,7 +38,7 @@ class PayPingPayView(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class PayPingVerifyView(View):
+class PayPingVerifyView(LoginRequiredMixin, HasCustomerAccessPermission, View):
 
     def post(self, request, *args, **kwargs):
         code = request.POST.get('code')

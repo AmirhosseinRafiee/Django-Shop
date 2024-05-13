@@ -1,14 +1,16 @@
 from django.views.generic import View
 from django.http import Http404
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from order.models import OrderModel, OrderStatusType
+from order.permissions import HasCustomerAccessPermission
 from ..models import PaymentModel, PaymentStatus, PaymentClient
 from ..clients import ZarinPalSandbox
 
 
-class ZarinpalPayView(View):
+class ZarinpalPayView(LoginRequiredMixin, HasCustomerAccessPermission, View):
 
     def get(self, request, *args, **kwargs):
         pk = self.kwargs['pk']
@@ -30,7 +32,7 @@ class ZarinpalPayView(View):
         return redirect(zarinpal_obj.generate_payment_url(authority))
 
 
-class ZarinpalVerifyView(View):
+class ZarinpalVerifyView(LoginRequiredMixin, HasCustomerAccessPermission, View):
 
     def get(self, request, *args, **kwargs):
         authority = request.GET.get('Authority')
