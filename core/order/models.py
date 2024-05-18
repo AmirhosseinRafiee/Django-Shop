@@ -71,8 +71,25 @@ class OrderModel(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['-created_date']
+
     def __str__(self):
         return f"{self.user.email} - {self.id}"
+
+    @property
+    def is_delivered(self):
+        return self.status == OrderStatusType.delivered.value
+
+    def get_status(self):
+        return {
+            'id': self.status,
+            "title":OrderStatusType(self.status).name,
+            "label":OrderStatusType(self.status).label,
+        }
+
+    def get_full_address(self):
+        return self.state + ' - ' + self.city + ' - ' + self.address
 
 class OrderItemModel(models.Model):
     order = models.ForeignKey(OrderModel, on_delete=models.CASCADE)

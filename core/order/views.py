@@ -71,8 +71,10 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
 
         cupon: CuponModel = cleaned_data['cupon']
         if cupon:
-            total_price -= cupon.calculate_discount_amount(
+            cupon_discount_amount = cupon.calculate_discount_amount(
                 total_price - discounted_amount)
+            total_price -= cupon_discount_amount
+            discounted_amount += cupon_discount_amount
             order.cupon = cupon
         order.total_price = total_price
         order.discounted_amount = discounted_amount
