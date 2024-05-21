@@ -1,4 +1,4 @@
-{% extends 'base-no-cart.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
 {% block content %}
@@ -9,33 +9,33 @@
             <!-- Heading -->
             <div class="d-flex justify-content-between align-items-end border-bottom pb-3 mb-7">
                 <h1 class="h3 mb-0">سبد خرید</h1>
-                <span id="id-cart-length">{{cart|length}} مورد</span>
+                <span>{{cart|length}} مورد</span>
             </div>
             <!-- End Heading -->
 
             <!-- Form -->
             <!-- List Group -->
             <ul class="list-group list-group-flush list-group-no-gutters mb-5">
-                {% for object in object_list.cartitemmodel_set.all %}
+                {% for item in cart %}
                 <!-- Item -->
-                <li class="list-group-item" id="product-{{object.product.id}}">
+                <li class="list-group-item">
                     <div class="d-flex">
-                        <div class="flex-shrink-0 ml-2">
-                            <img class="avatar avatar-xl avatar-4x3" src="{{object.product.image.url}}"
+                        <div class="flex-shrink-0">
+                            <img class="avatar avatar-xl avatar-4x3" src="{{item.product.image.url}}"
                                 alt="Image Description">
                         </div>
 
                         <div class="flex-grow-1 ms-3">
                             <div class="row">
-                                <div class="col-sm-5 mb-3 mb-sm-0">
+                                <div class="col-sm-7 mb-3 mb-sm-0">
                                     <h5><a class="text-dark"
-                                            href="{% url 'shop:product-detail' slug=object.product.slug %}">{{object.product.title}}</a>
+                                            href="{% url 'shop:product-detail' slug=item.product.slug %}">{{item.product.title}}</a>
                                     </h5>
 
                                     <div class="d-grid gap-1">
                                         <div class="text-body">
                                             <span class="small">دسته بندی:</span>
-                                            {% for category in object.product.category.all %}
+                                            {% for category in item.product.category.all %}
                                             <a class="link-sm link-secondary fw-semibold small"
                                                 href="#">{{category.title}}</a>
                                             {% if not forloop.last %}
@@ -46,48 +46,32 @@
                                         <div class="text-body">
                                             <span class="small">قیمت واحد:</span>
                                             <span
-                                                class="fw-semibold small formatted-price">{{object.product.get_price}}</span>
+                                                class="fw-semibold small formatted-price">{{item.product.get_price}}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- End Col -->
-                                <div class="col-sm-5">
+                                <div class="col-sm-3">
                                     <div class="row">
-                                        <div class="col-auto mb-2">
-                                            <div class="quantity">
-                                                <div class="input-group input-group-sm quantity-selector px-5">
-                                                    <button type="button" class="btn btn-sm btn-icon btn-outline-primary"
-                                                        onclick="addToCart(`{{object.product.id}}`)">
-                                                        <i class="bi-plus"></i>
-                                                    </button>
-                                                    <input type="number" class="form-control" value="{{object.quantity}}" min="1"
-                                                        max="{{item.product.stock}}">
-                                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger"
-                                                        onclick="addToCart(`{{object.product.id}}`, -1)">
-                                                        <i class="bi-dash"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
+                                        <div class="col-auto">
+                                            <!-- Select -->
+                                            <select class="form-select form-select-sm mb-3 select-quantity"
+                                                data-product-id="{{ item.product.id }}">
+                                                {% with ''|center:item.product.stock as range %}
+                                                {% for _ in range %}
+                                                <option value="{{forloop.counter}}" {% if item.quantity == forloop.counter %} selected {% endif %}>
+                                                    {{forloop.counter}}
+                                                </option>
+                                                {% endfor %}
+                                                {% endwith %}
+                                            </select>
+                                            <!-- End Select -->
                                         </div>
-                                        {% if object.product.stock < object.quantity %}
-                                            {% if object.product.stock == 0 %}
-                                            <div class="alert alert-danger col-auto mb-2 small issue" role="alert" id="alert-{{object.product.id}}">
-                                                <span class="small">
-                                                موجودی محصول تمام شده است
-                                                </span>
-                                            </div>
-                                            {% else %}
-                                                <div class="alert alert-danger col-auto mb-2 small issue" role="alert" id="alert-{{object.product.id}}">
-                                                    <span class="small">
-                                                    مقدار این کالا از موجودی آن بیشتر است
-                                                    </span>
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
+
                                         <div class="col-auto">
                                             <div class="d-grid gap-2 d-flex justify-content-between">
                                                 <button class="small btn btn-sm"
-                                                    onclick="removeFromCart(`{{object.product.id}}`)">
+                                                    onclick="removeFromCart(`{{item.product.id}}`)">
                                                     <i class="bi-trash me-1"></i> حذف
                                                 </button>
                                                 {% if request.user.is_authenticated %}
@@ -104,7 +88,7 @@
                                 <!-- End Col -->
 
                                 <div class="col-4 col-sm-2 d-none d-sm-inline-block text-right">
-                                    <span class="h5 d-block mb-1 formatted-price" id="total-price">{{object.get_total_price}}</span>
+                                    <span class="h5 d-block mb-1 formatted-price">{{item.total_price}}</span>
                                 </div>
                                 <!-- End Col -->
                             </div>
@@ -149,14 +133,14 @@
 
                                 <dl class="row">
                                     <dt class="col-sm-6">جمع</dt>
-                                    <dd class="col-sm-12 text-sm-end mb-0 formatted-price" id="cart-total-price">{{cart_total_price}}
+                                    <dd class="col-sm-12 text-sm-end mb-0 formatted-price">{{cart.get_cart_total_price}}
                                     </dd>
                                 </dl>
                                 <!-- End Row -->
                             </div>
 
                             <div class="d-grid">
-                                <a class="btn btn-primary btn-lg disabled" id="btn-submit" href="{% url 'order:checkout' %}">ثبت سفارش</a>
+                                <a class="btn btn-primary btn-lg {% if cart|length == 0 %} disabled  {% endif %}" href="{% url 'order:checkout' %}">ثبت سفارش</a>
                             </div>
                         </form>
                     </div>
@@ -198,16 +182,34 @@
 <script>
     var csrfToken = '{{ csrf_token }}';
     var removeProductUrl = '{% url "cart:session-remove-product" %}';
-
-    document.addEventListener("DOMContentLoaded", function() {
-        issueCount = document.querySelectorAll('.issue').length;
-        enableSubmitBtn();
+</script>
+<script>
+    $(document).ready(function () {
+        $('.select-quantity').change(function () {
+            var selectedOption = $(this).val();
+            var productId = $(this).data('product-id');
+            $.ajax({
+                url: '{% url "cart:session-add-product" %}',
+                method: 'POST',
+                data: {
+                    product_id: productId,
+                    quantity: selectedOption,
+                    overide_quantity: true,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    // On success, reload the page
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    // Handle error if necessary
+                    console.error('Error:', error);
+                }
+            });
+        });
     });
-    function enableSubmitBtn() {
-        if (issueCount == 0) {
-            $('#btn-submit').removeClass('disabled');
-        }
-    }
+</script>
+<script>
     function removeFromCart(product_id) {
         $.ajax({
             url: removeProductUrl,
@@ -240,7 +242,6 @@
                 }).showToast();
             }
         });
-        enableSubmitBtn();
     }
 </script>
 {% endblock %}

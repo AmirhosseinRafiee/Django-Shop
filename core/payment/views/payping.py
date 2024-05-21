@@ -54,17 +54,18 @@ class PayPingVerifyView(LoginRequiredMixin, HasCustomerAccessPermission, View):
             amount=payment.amount,
         )
         res_json = res.json()
+        order = payment.order
         if res.status_code == 200:
             payment.status = PaymentStatus.success.value
-            order = payment.order
             order.status = OrderStatusType.processing.value
-            order.save()
             redirect_url = reverse('order:completed')
         else:
             payment.status = PaymentStatus.failed.value
+            order.status = OrderStatusType.canceled.value
             redirect_url = reverse('order:failed')
         payment.ref_id = ref_id
         payment.response_code = res.status_code
         payment.response_json = res_json
         payment.save()
+        order.save()
         return redirect(redirect_url)

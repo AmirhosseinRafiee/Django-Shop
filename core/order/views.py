@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.contrib import messages
 from django.db import transaction
+from django.db.models import F, Case, When, Value
 from django.utils import timezone
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import redirect
@@ -12,6 +13,7 @@ from cart.models import CartModel, CartItemModel
 from cart.cart import CartSession
 from payment.models import PaymentModel, PaymentClient
 from payment.clients import ZarinPalSandbox
+from shop.models import ProductModel
 from .permissions import HasCustomerAccessPermission
 from .models import OrderModel, OrderItemModel, CuponModel
 from .forms import CheckOutForm
@@ -45,6 +47,11 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
             messages.error(self.request, _("سبد خرید شما خالیست!"))
             return redirect(reverse('shop:product-grid'))
 
+        for cart_item in cart_items:
+            if cart_item.quantity > cart_item.product.stock:
+                messages.error(self.request, _(f"موجودی کالای {cart_item.product.title} کمتر از درخواست شماست"))
+                return redirect(reverse('cart:session-cart-summary'))
+
         # Create the order object
         order = OrderModel(
             user=self.request.user,
@@ -56,6 +63,7 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
 
         # Create order items and calculate total price and discounted amount
         order_item_list = []
+        stock_updates = []
         for cart_item in cart_items:
             order_item = OrderItemModel(
                 order=order,
@@ -69,6 +77,9 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
                 cart_item.quantity * cart_item.product.discount_percent / 100
             total_price += cart_item.product.price * cart_item.quantity
 
+            stock_updates.append(
+                When(id=cart_item.product.id, then=F('stock') - cart_item.quantity))
+
         cupon: CuponModel = cleaned_data['cupon']
         if cupon:
             cupon_discount_amount = cupon.calculate_discount_amount(
@@ -81,6 +92,11 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
 
         try:
             with transaction.atomic():
+                # Update products stock in one query
+                ProductModel.objects.filter(id__in=[item.product.id for item in cart_items]).update(
+                    stock=Case(*stock_updates)
+                )
+
                 # Save order and order items
                 order.save()
                 OrderItemModel.objects.bulk_create(order_item_list)
@@ -91,10 +107,11 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
         except Exception as e:
             # logger.error(f"An error occurred while processing the order: {e}")
             messages.error(self.request, _(
-                "خطایی در هنگام پردازش درخواست شما رخ داد. لطفاً بعداً مجدداً امتحان کنید"))
-            return redirect(reverse('order:checkout'))
+                "خطایی در هنگام پردازش درخواست شما رخ داد. لطفاً مجدداً امتحان کنید"))
+            return redirect(reverse('cart:session-cart-summary'))
 
-        payment_url_pattern = self._get_payment_pattern(cleaned_data['payment'])
+        payment_url_pattern = self._get_payment_pattern(
+            cleaned_data['payment'])
         return redirect(reverse(payment_url_pattern, kwargs={'pk': order.pk}))
 
     def _get_payment_pattern(self, payment_val):

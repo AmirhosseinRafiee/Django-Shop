@@ -24,7 +24,7 @@ class CartSession:
         if overide_quantity:
             self.cart[product_id]["quantity"] = quantity
         else:
-            self.cart[product_id]["quantity"] += quantity
+            self.cart[product_id]["quantity"] = min(self.cart[product_id]["quantity"] + quantity, product_stock)
         if self.cart[product_id]["quantity"] == 0:
             self.remove(product_id)
         self.save()
@@ -155,5 +155,5 @@ class CartSession:
         else:
             if quantity + cart_quantity < 0:
                 raise ValueError("Quantity cannot be negative")
-            elif quantity + cart_quantity > product_stock:
+            elif quantity > 0 and quantity + cart_quantity > product_stock:
                 raise ValueError("Quantity exceeds available stock")

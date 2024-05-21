@@ -47,17 +47,18 @@ class ZarinpalVerifyView(LoginRequiredMixin, HasCustomerAccessPermission, View):
             authority=authority,
             amount=payment.amount,
         )
+        order = payment.order
         if status == 'OK' and res['Status'] in [100, 101]:
             payment.status = PaymentStatus.success.value
-            order = payment.order
             order.status = OrderStatusType.processing.value
-            order.save()
             redirect_url = reverse('order:completed')
         else:
             payment.status = PaymentStatus.failed.value
+            order.status = OrderStatusType.canceled.value
             redirect_url = reverse('order:failed')
         payment.ref_id = res['RefID']
         payment.response_code = res['Status']
         payment.response_json = res
         payment.save()
+        order.save()
         return redirect(redirect_url)

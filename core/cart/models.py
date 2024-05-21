@@ -22,3 +22,6 @@ class CartItemModel(models.Model):
 
     def __str__(self):
         return f"{self.product.title} - {self.cart.id}"
+
+    def get_total_price(self):
+        return self.quantity * self.product.get_price()

@@ -54,17 +54,18 @@ class AqayePardakhtVerifyView(LoginRequiredMixin, HasCustomerAccessPermission, V
             authority=transid,
             amount=payment.amount,
         )
+        order = payment.order
         if status == '1' and res['code'] in ['1', '2']:
             payment.status = PaymentStatus.success.value
-            order = payment.order
             order.status = OrderStatusType.processing.value
-            order.save()
             redirect_url = reverse('order:completed')
         else:
             payment.status = PaymentStatus.failed.value
+            order.status = OrderStatusType.canceled.value
             redirect_url = reverse('order:failed')
         payment.ref_id = request.POST.get('tracking_number')
         payment.response_code = res['code']
         payment.response_json = res
         payment.save()
+        order.save()
         return redirect(redirect_url)
