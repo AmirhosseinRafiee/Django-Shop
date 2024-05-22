@@ -85,3 +85,10 @@ class ProductImageModel(models.Model):
 
     class Meta:
         ordering = ["-created_date"]
+
+class WishlistProductModel(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey('ProductModel', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'product')
