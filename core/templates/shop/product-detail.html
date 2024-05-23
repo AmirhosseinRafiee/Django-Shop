@@ -71,15 +71,25 @@
     <!-- End Col -->
 
     <div class="col-md-5">
-      <!-- Rating -->
-      <a class="d-flex gap-1 mb-4" href="#reviewSection">
-        <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-        <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-        <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-        <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-        <img src="{% static 'svg/illustrations/star.svg' %}" alt="Review rating" width="16">
-        <span class="ms-1">287 نظر</span>
-      </a>
+      <div class="d-flex justify-content-between">
+        <!-- Rating -->
+        <a class="d-flex gap-1 mb-4" href="#reviewSection">
+          <img src="{% static '/svg/illustrations/star.svg' %}" alt="Review rating" width="16">
+          <img src="{% static '/svg/illustrations/star.svg' %}" alt="Review rating" width="16">
+          <img src="{% static '/svg/illustrations/star.svg' %}" alt="Review rating" width="16">
+          <img src="{% static '/svg/illustrations/star.svg' %}" alt="Review rating" width="16">
+          <img src="{% static '/svg/illustrations/star.svg' %}" alt="Review rating" width="16">
+          <span class="ms-1">287 نظر</span>
+        </a>
+        <!-- End Rating -->
+        {% if request.user.is_authenticated %}
+        <button type="button"
+          class="btn btn-outline-secondary btn-xs btn-icon rounded-circle {% if object.in_wishlist %} active {% endif %}"
+          data-bs-toggle="tooltip" data-bs-placement="top" title="افزودن به علایق">
+          <i class="bi-heart"></i>
+        </button>
+        {% endif %}
+      </div>
       <!-- End Rating -->
 
       <!-- Heading -->
@@ -333,7 +343,7 @@
 <!-- End Content -->
 
 <!-- Card Grid -->
-{% similar_products object %}
+{% similar_products %}
 <!-- End Card Grid -->
 
 <!-- Review Section -->
