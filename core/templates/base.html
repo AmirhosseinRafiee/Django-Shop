@@ -87,7 +87,10 @@
               <!-- Shopping Cart -->
               <button class="btn btn-ghost-secondary btn-icon" type="button" data-bs-toggle="offcanvas"
                 data-bs-target="#offcanvasNavbarShoppingCart" aria-controls="offcanvasNavbarShoppingCart"
-                {% if request.path == cart_summary_url %} disabled {% endif %}>
+                  {% if request.path == cart_summary_url %}
+                  disabled
+                  {% endif %}
+                >
                 <i class="bi-basket"></i>
                 <span class="cart-item-count">{{cart|length}}</span>
               </button>
@@ -546,6 +549,38 @@
             reject(errorThrown); // Reject with the error message
           }
         });
+      });
+    }
+
+    function toggleWishlist(element, productId, quantity) {
+      $.ajax({
+        url: '{% url "shop:wishlist-toggle" %}',
+        method: 'POST',
+        data: {
+          product_id: productId,
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function (response) {
+          $(element).toggleClass('active');
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          // Extract the error message from the response text if available
+          var errorMessage = "";
+          if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+            errorMessage = jqXHR.responseJSON.message;
+          } else {
+            // If no specific error message is returned, use a generic error message
+            errorMessage = "An error occurred while processing your request.";
+          }
+          Toastify({
+            text: errorMessage,
+            className: 'error',
+            close: true,
+            style: {
+              background: 'red'
+            }
+          }).showToast();
+        }
       });
     }
 

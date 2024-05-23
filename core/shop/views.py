@@ -1,8 +1,10 @@
-from typing import Any
+from django.views.generic import View, ListView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, ExpressionWrapper, IntegerField, Value
-from django.db.models.query import QuerySet
-from django.views.generic import ListView, DetailView
 from django.db.models import Exists, OuterRef
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext_lazy as _
 from .models import ProductModel, ProductStatus, ProductCategoryModel, WishlistProductModel
 from .filters import ProductFilter
 from .permissons import IsAdminOrPublishedPermission
@@ -64,3 +66,17 @@ class ShopProductDetailView(IsAdminOrPublishedPermission, DetailView):
                 in_wishlist=Exists(wishlist_subquery)
             )
         return qs
+
+class WishlistToggleView(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        product_id = request.POST.get('product_id')
+        product = get_object_or_404(ProductModel, id=product_id)
+        wishlist, created = WishlistProductModel.objects.get_or_create(user=self.request.user, product=product)
+        if not created:
+            wishlist.delete()
+            status, message = 204, _('محصول با موفقیت از لیست علایق حذف شد')
+        else:
+            status, message = 201, _('محصول با موفقیت به لیست علایق اضافه شد')
+
+        return JsonResponse({'message': message}, status=status)
