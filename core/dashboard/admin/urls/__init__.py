@@ -9,4 +9,5 @@ urlpatterns = [
     path('coupon/', include('dashboard.admin.urls.coupon')),
     path('user/', include('dashboard.admin.urls.users')),
     path('order/', include('dashboard.admin.urls.orders')),
+    path('review/', include('dashboard.admin.urls.reviews')),
 ]

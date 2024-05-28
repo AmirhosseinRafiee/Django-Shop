@@ -21,8 +21,8 @@
                     <div class="card-pinned-top-end">
                         {% if request.user.is_authenticated %}
                         <button type="button" class="btn btn-outline-secondary btn-xs btn-icon rounded-circle
-                            {% if product.in_wishlist %} active {% endif %}"
-                            data-bs-toggle="tooltip" data-bs-placement="top" onclick="toggleWishlist(this, `{{product.id}}`)">
+                            {% if product.in_wishlist %} active {% endif %}" data-bs-toggle="tooltip"
+                            data-bs-placement="top" onclick="toggleWishlist(this, `{{product.id}}`)">
                             <i class="bi-heart"></i>
                         </button>
                         {% endif %}
@@ -53,14 +53,12 @@
                 <div class="card-footer pt-0">
                     <!-- Rating -->
                     <a class="d-inline-flex align-items-center mb-3" href="#">
-                        <div class="d-flex gap-1 ms-2">
-                            <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
-                            <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
-                            <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
-                            <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
-                            <img src="{% static 'svg/illustrations/star-muted.svg' %}" alt="Review rating" width="16">
+                        {% if product.average_rate %}
+                        <div class="d-flex gap-1 ms-2 Stars" style="--rating: {{product.average_rate}};"
+                            aria-label="Rating of this product is 2.3 out of 5.">
                         </div>
-                        <span class="small">0</span>
+                        <span class="small">{{product.average_rate}}</span>
+                        {% endif %}
                     </a>
                     <!-- End Rating -->
 

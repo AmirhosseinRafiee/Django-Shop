@@ -1,0 +1,102 @@
+{% extends 'dashboard/admin/base.html' %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-light mb-0">
+        <li class="breadcrumb-item">حساب</li>
+        <li class="breadcrumb-item">داشبورد ادمین</li>
+        <li class="breadcrumb-item">نظرات</li>
+        <li class="breadcrumb-item active" aria-current="page">
+            ویرایش نظر
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<!-- Card -->
+<div class="card">
+    <!-- Header -->
+    <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="card-header-title">ویرایش نظر</h5>
+        <a class="btn btn-sm btn-primary" target="_blank"
+            href="{% url 'shop:product-detail' slug=object.product.slug %}">نمایش
+            محصول</a>
+    </div>
+    <!-- End Header -->
+
+    <!-- Body -->
+    <div class="card-body">
+        <form action="." method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row d-flex">
+                <div class="col-md-6 mb-3">
+                    <label for="id_product_title">نام محصول</label>
+                    <input type="text" name="product_title" class="form-control is-valid" id="id_product_title"
+                        value="{{ form.instance.product.title }}" disabled>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_fullname">
+                        نام و نام خانوادگی
+                    </label>
+                    <input type="text" name="fullname" class="form-control is-valid" id="id_fullname"
+                        value="{{ form.instance.user.profile.full_name }}" disabled>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_created_date">تاریخ ثبت</label>
+                    <input type="text" name="created_date" class="form-control is-valid" id="id_created_date"
+                        value="{{ form.instance.created_date|date:'Y-m-d H:i' }}" disabled>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_updated_date">تاریخ ویرایش</label>
+                    <input type="text" name="updated_date" class="form-control is-valid" id="id_updated_date"
+                        value="{{ form.instance.updated_date|date:'Y-m-d H:i' }}" disabled>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_rate">امتیاز</label>
+                    <input type="text" name="rate" class="form-control is-valid" id="id_rate"
+                        value="{{ form.instance.rate }}" disabled>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_status">وضعیت</label>
+                    {{object.status}}
+                    <select name="status" class="form-select is-valid" id="id_status" value="{{object.status}}">
+                        {% for val, label in review_status %}
+                        <option value="{{val}}">{{label}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label for="id_description">توضیحات مختصر</label>
+                    <div class="quill-custom">
+                        <textarea name="description" class="form-control is-valid"
+                            style="height: 5rem;">{{ form.instance.description }}</textarea>
+                    </div>
+                </div>
+                {% if form.instance.is_buyer %}
+                <div class="col-md-6 mb-3">
+                    <input type="text" name="is_buyer" class="form-control is-valid" id="id_is_buyer"
+                        value="کاربر این محصول را خریداری کرده است" disabled>
+                </div>
+                {% endif %}
+            </div>
+            <div class=" d-flex pt-5 justify-content-end">
+                <a class="btn btn-secondary ms-3" href="{% url 'dashboard:admin:review-list' %}">بازگشت</a>
+                <button type="submit" class="btn btn-primary ms-3">ثبت تغییرات</button>
+            </div>
+    </div>
+    </form>
+</div>
+<!-- End Body -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set initial values for status select field
+        var initialStatus = "{{ form.instance.status }}";
+        var statusSelect = document.getElementById('id_status');
+        statusSelect.value = initialStatus
+    });
+</script>
+{% endblock %}
