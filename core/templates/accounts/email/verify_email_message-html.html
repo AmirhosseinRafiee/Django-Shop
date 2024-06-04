@@ -1,0 +1,16 @@
+<div style="background-color: #c2c2c2; padding: 15px; direction: rtl; text-align: right;">
+    <h2
+        style="margin: 0; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; background-color: #377DFF; color: #ffffff;">
+        تأیید ایمیل</h2>
+    <div style="margin: 0; padding: 15px; background-color: #ffffff;">
+        <p>سلام {{ user.name }},</p>
+        <p>شما در {{ domain }} یک حساب کاربری ایجاد کرده‌اید و نیاز به تأیید ایمیل دارید. لطفاً برای تأیید ایمیل خود روی
+            دکمه زیر کلیک کنید.</p>
+        <a href="{{ protocol }}://{{ domain }}{% url 'accounts:verify-email-confirm' uidb64=uid token=token %}"
+            style="border: 0; color: #ffffff; background-color: #377DFF; padding: 15px; font-weight: bold; text-decoration: none; border-radius: 5px;">
+            تأیید ایمیل
+        </a>
+        <p style="margin-top: 40px;">یا می‌توانید لینک زیر را در مرورگر خود کپی کنید</p>
+        <p>{{ protocol }}://{{ domain }}{% url 'accounts:verify-email-confirm' uidb64=uid token=token %}</p>
+    </div>
+</div>

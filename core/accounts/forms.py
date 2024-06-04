@@ -1,10 +1,13 @@
-from django.contrib.auth import forms as auth_forms
-from django.contrib.auth.forms import PasswordResetForm
+from django import forms
+from django.contrib.auth import password_validation, forms as auth_forms, get_user_model
+from django.contrib.auth.forms import PasswordResetForm, UserCreationForm
 from django.template import loader
 from django.core.mail import EmailMultiAlternatives
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from .utils import EmailThread
+from .utils import EmailThread, send_verification_email
+
+User = get_user_model()
 
 class CustomAuthentiactionForm(auth_forms.AuthenticationForm):
 
@@ -12,7 +15,8 @@ class CustomAuthentiactionForm(auth_forms.AuthenticationForm):
         super().confirm_login_allowed(user)
 
         if not user.is_verified:
-            raise ValidationError(_('This account is not verified.'))
+            send_verification_email(self.request, user)
+            raise ValidationError(_('حساب کاربری تایید نشده است. ایمیلی برای تایید حساب به شما ارسال شد'))
 
 class CustomPasswordResetForm(PasswordResetForm):
 
@@ -39,3 +43,46 @@ class CustomPasswordResetForm(PasswordResetForm):
             email_message.attach_alternative(html_email, "text/html")
 
         EmailThread(email_message).start()
+
+class CustomUserCreationForm(UserCreationForm):
+    error_messages = {
+        'password_mismatch': _("رمزهای عبور همخوانی ندارند."),
+        'password_too_similar': _("این رمز عبور خیلی مشابه سایر اطلاعات است."),
+        'password_too_short': _("رمز عبور باید حداقل 8 کاراکتر باشد."),
+        'password_too_common': _("این رمز عبور خیلی رایج است."),
+        'password_entirely_numeric': _("رمز عبور نباید تماماً عددی باشد."),
+    }
+
+    class Meta:
+        model = User
+        fields = ('email',)
+        labels = {
+            'email': _("آدرس ایمیل"),
+            'password1': _("رمز عبور"),
+            'password2': _("تکرار رمز عبور"),
+        }
+        error_messages = {
+            'email': {
+                'unique': _("این ایمیل قبلاً ثبت شده است."),
+                'required': _("وارد کردن ایمیل الزامی است."),
+                'invalid': _("ایمیل وارد شده معتبر نمی‌باشد."),
+            },
+            'password1': {
+                'required': _("وارد کردن رمزعبور الزامی است."),
+            },
+            'password2': {
+                'required': _("وارد کردن تکرار رمزعبور الزامی است."),
+            }
+        }
+
+    def _post_clean(self):
+        super(forms.ModelForm, self)._post_clean()
+        # Validate the password after self.instance is updated with form data
+        # by super().
+        password = self.cleaned_data.get("password1")
+        if password:
+            try:
+                password_validation.validate_password(password, self.instance)
+            except ValidationError as error:
+                self.add_error("password1", self.error_messages.get(error.error_list[0].code, _('رمزعبور بهتری انتخاب کنید')))
+
