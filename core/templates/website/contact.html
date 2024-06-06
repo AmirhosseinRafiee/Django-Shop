@@ -127,6 +127,9 @@
                 <form action="." method="post">
                     {% csrf_token %}
                     <div class="row gx-3">
+                        {% if request.user.profile.first_name %}
+                        <input type="hidden" name="first_name" value="{{request.user.profile.first_name}}">
+                        {% else %}
                         <div class="col-sm-6">
                             <!-- Form -->
                             <div class="mb-3">
@@ -137,7 +140,11 @@
                             <!-- End Form -->
                         </div>
                         <!-- End Col -->
+                        {% endif %}
 
+                        {% if request.user.profile.last_name %}
+                        <input type="hidden" name="last_name" value="{{request.user.profile.last_name}}">
+                        {% else %}
                         <div class="col-sm-6">
                             <!-- Form -->
                             <div class="mb-3">
@@ -148,10 +155,14 @@
                             <!-- End Form -->
                         </div>
                         <!-- End Col -->
+                        {% endif %}
                     </div>
                     <!-- End Row -->
 
                     <div class="row gx-3">
+                        {% if request.user.is_authenticated %}
+                        <input type="hidden" name="email" value="{{request.user.email}}">
+                        {% else %}
                         <div class="col-sm-6">
                             <!-- Form -->
                             <div class="mb-3">
@@ -162,7 +173,10 @@
                             <!-- End Form -->
                         </div>
                         <!-- End Col -->
-
+                        {% endif %}
+                        {% if request.user.profile.phone_number %}
+                        <input type="hidden" name="phone_number" value="{{request.user.profile.phone_number}}">
+                        {% else %}
                         <div class="col-sm-6">
                             <!-- Form -->
                             <div class="mb-3">
@@ -174,6 +188,7 @@
                             <!-- End Form -->
                         </div>
                         <!-- End Col -->
+                        {% endif %}
                     </div>
                     <!-- End Row -->
 

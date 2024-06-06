@@ -1,0 +1,89 @@
+{% extends 'dashboard/admin/base.html' %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-light mb-0">
+        <li class="breadcrumb-item">حساب</li>
+        <li class="breadcrumb-item">داشبورد ادمین</li>
+        <li class="breadcrumb-item">تیکت ها</li>
+        <li class="breadcrumb-item active" aria-current="page">
+            ویرایش تیکت
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<!-- Card -->
+<div class="card">
+    <!-- Header -->
+    <div class="card-header border-bottom">
+        <h5 class="card-header-title"> تیکت شماره {{object.id}}</h5>
+    </div>
+    <!-- End Header -->
+
+    <!-- Body -->
+
+    <div class="card-body">
+
+        <div class="row d-flex align-items-center">
+            <div class="col-md-6 mb-3">
+                <dt>نام و نام خانوادگی: </dt>
+                <dl>{{object.get_full_name}}</dl>
+            </div>
+            <div class="col-md-6 mb-3">
+                <dt>شماره همراه: </dt>
+                <dl>{{object.phone_number|default:'-'}}</dl>
+            </div>
+            <div class="col-md-6 mb-3">
+                <dt>ایمیل: </dt>
+                <dl>{{object.email}}</dl>
+            </div>
+            <div class="col-md-6 mb-3">
+                <dt>وضعیت:</dt>
+                <dl>
+                    <form action="." method="post" id="ticket-form-id">
+                        {% csrf_token %}
+                        <select class="form-select" id="id-status" name="status">
+                            {% for id, label in status_types %}
+                            <option value="{{id}}">{{label}}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </dl>
+            </div>
+            <div class="col-md-12 mb-3">
+                <dt>متن:</dt>
+                <dl>
+                    <p>{{object.description}}</p>
+                </dl>
+            </div>
+        </div>
+        <!-- End Row -->
+
+    </div>
+    <div class="card-footer row pt-5 mt-5">
+
+        <div class=" d-flex pt-5 justify-content-end">
+            <a class="btn btn-secondary ms-3" href="{% url 'dashboard:admin:ticket-list' %}">بازگشت</a>
+            <button type="submit" form="ticket-form-id" class="btn btn-primary ms-3">ثبت تغییرات</button>
+        </div>
+
+    </div>
+
+    <!-- End Body -->
+
+</div>
+<!-- End Body -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set initial values for status select field
+        var initialStatus = "{{ object.status }}";
+        var statusSelect = document.getElementById('id-status');
+        statusSelect.value = initialStatus
+    });
+</script>
+{% endblock %}

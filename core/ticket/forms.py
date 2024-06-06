@@ -6,6 +6,29 @@ class TicketForm(forms.ModelForm):
     class Meta:
         model = TicketModel
         fields = ['first_name', 'last_name', 'email', 'phone_number', 'description']
+        error_messages = {
+            'first_name': {
+                'required': "وارد کردن نام الزامی است.",
+                'max_length': "نام نمی‌تواند بیش از ۵۰ کاراکتر باشد.",
+            },
+            'last_name': {
+                'required': "وارد کردن نام خانوادگی الزامی است.",
+                'max_length': "نام خانوادگی نمی‌تواند بیش از ۵۰ کاراکتر باشد.",
+            },
+            'email': {
+                'required': "وارد کردن ایمیل الزامی است.",
+                'invalid': "لطفاً یک ایمیل معتبر وارد کنید.",
+            },
+            'phone_number': {
+                'invalid': "لطفاً یک شماره تلفن معتبر وارد کنید.",
+                'max_length': "شماره تلفن نمی‌تواند بیش از ۱۵ کاراکتر باشد.",
+            },
+            'description': {
+                'required': "وارد کردن توضیحات الزامی است.",
+            },
+        }
+
+
 
 class NewsletterSubscriberForm(forms.ModelForm):
 

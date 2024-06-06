@@ -5,3 +5,4 @@ from .coupon import *
 from .users import *
 from .orders import *
 from .reviews import *
+from .tickets import *
