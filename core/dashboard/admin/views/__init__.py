@@ -6,3 +6,4 @@ from .users import *
 from .orders import *
 from .reviews import *
 from .tickets import *
+from .newsletters import *

@@ -17,7 +17,7 @@ class NewsletterSubscribeView(View):
         form = NewsletterSubscriberForm(request.POST)
         if form.is_valid():
             form.save()
-            return JsonResponse(data={'message': 'dorost shod'})
+            return JsonResponse(data={'message': _('با موفقیت عضو خبرنامه شدید')})
 
         error_messages = [error[0] for error in form.errors.values()]
         return JsonResponse(data={'error':error_messages[0]}, status=400)

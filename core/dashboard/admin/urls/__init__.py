@@ -11,4 +11,5 @@ urlpatterns = [
     path('order/', include('dashboard.admin.urls.orders')),
     path('review/', include('dashboard.admin.urls.reviews')),
     path('ticket/', include('dashboard.admin.urls.tickets')),
+    path('newsletter/', include('dashboard.admin.urls.newsletters')),
 ]
