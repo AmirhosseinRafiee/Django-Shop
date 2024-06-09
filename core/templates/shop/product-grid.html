@@ -21,7 +21,6 @@
             <li class="breadcrumb-item">
               <a href="#">محصولات</a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">توری</li>
           </ol>
         </nav>
         <!-- End Breadcrumb -->
@@ -96,7 +95,7 @@
                   <select class="form-select form-select-sm" name="category" id="category-filter">
                     <option value="" selected>انتخاب دسته بندی</option>
                     {% for category in categories %}
-                    <option value="{{category.title}}">{{category.title}}</option>
+                    <option value="{{category.slug}}">{{category.title}}</option>
                     {% endfor %}
                   </select>
                 </div>
@@ -147,20 +146,6 @@
             </div>
             <!-- End Select -->
 
-            <!-- Nav -->
-            <ul class="nav nav-segment">
-              <li class="nav-item">
-                <a class="nav-link active" href="/products-grid.html">
-                  <i class="bi-grid-fill"></i>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/products-list.html">
-                  <i class="bi-list"></i>
-                </a>
-              </li>
-            </ul>
-            <!-- End Nav -->
           </div>
         </div>
       </div>
@@ -180,7 +165,7 @@
 
               <div class="card-pinned-top-end">
                 {% if request.user.is_authenticated %}
-                <button type="button" class="btn btn-outline-secondary btn-xs btn-icon rounded-circle
+                <button type="button" class="btn btn-outline-primary btn-xs btn-icon rounded-circle
                   {% if object.in_wishlist %} active {% endif %}" data-bs-toggle="tooltip" data-bs-placement="top"
                   onclick="toggleWishlist(this, `{{object.id}}`)">
                   <i class="bi-heart"></i>
@@ -192,7 +177,7 @@
             <div class="card-body">
               <div class="mb-2">
                 {% for category in object.category.all %}
-                <a class="link-sm link-secondary" href="#">{{category.title}}</a>
+                <a class="link-sm link-secondary" href="?category={{category.slug}}">{{category.title}}</a>
                 {% if not forloop.last %}
                 ,
                 {% endif %}
@@ -278,46 +263,9 @@
 </div>
 <!-- End Card Grid -->
 
-<!-- Clients -->
-<div class="container content-space-2">
-  <div class="row">
-    <div class="col text-center py-3">
-      <img class="avatar avatar-lg avatar-4x3" src="{% static 'svg/brands/hollister-dark.svg' %}" alt="Logo">
-    </div>
-    <!-- End Col -->
-
-    <div class="col text-center py-3">
-      <img class="avatar avatar-lg avatar-4x3" src="{% static 'svg/brands/levis-dark.svg' %}" alt="Logo">
-    </div>
-    <!-- End Col -->
-
-    <div class="col text-center py-3">
-      <img class="avatar avatar-lg avatar-4x3" src="{% static 'svg/brands/new-balance-dark.svg' %}" alt="Logo">
-    </div>
-    <!-- End Col -->
-
-    <div class="col text-center py-3">
-      <img class="avatar avatar-lg avatar-4x3" src="{% static 'svg/brands/puma-dark.svg' %}" alt="Logo">
-    </div>
-    <!-- End Col -->
-
-    <div class="col text-center py-3">
-      <img class="avatar avatar-lg avatar-4x3" src="{% static 'svg/brands/nike-dark.svg' %}" alt="Logo">
-    </div>
-    <!-- End Col -->
-
-    <div class="col text-center py-3">
-      <img class="avatar avatar-lg avatar-4x3" src="{% static 'svg/brands/tnf-dark.svg' %}" alt="Logo">
-    </div>
-    <!-- End Col -->
-  </div>
-  <!-- End Row -->
-</div>
-<!-- End Clients -->
 {% endblock %}
 
 {% block extra_js %}
-<!-- jQuery Script -->
 <script>
   $(document).ready(function () {
     let current_url_params = new URLSearchParams(window.location.search)

@@ -10,6 +10,15 @@ from .utils import EmailThread, send_verification_email
 User = get_user_model()
 
 class CustomAuthentiactionForm(auth_forms.AuthenticationForm):
+    error_messages = {
+        'invalid_login': _('لطفاً نام کاربری و گذرواژه صحیح وارد کنید'),
+        'inactive': _('این حساب کاربری غیر فعال است'),
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].error_messages['required'] = _('وارد کردن نام کاربری الزامی است')
+        self.fields['password'].error_messages['required'] = _('وارد کردن گذرواژه الزامی است')
 
     def confirm_login_allowed(self, user):
         super().confirm_login_allowed(user)

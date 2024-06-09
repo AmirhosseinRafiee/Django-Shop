@@ -1,3 +1,4 @@
+from django.db.models.base import Model as Model
 from django.views.generic import View, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, ExpressionWrapper, IntegerField, Value, Count, Case, When, IntegerField, Exists, OuterRef, Prefetch, Subquery
@@ -54,6 +55,11 @@ class ShopProductGridView(ListView):
 
 class ShopProductDetailView(IsAdminOrPublishedPermission, DetailView):
     template_name = 'shop/product-detail.html'
+
+    def get_object(self, *args, **kwargs):
+        if hasattr(self, 'object'):
+            return self.object
+        return super().get_object(*args, **kwargs)
 
     def get_queryset(self):
         accepted_reviews = ReviewProductModel.objects.filter(

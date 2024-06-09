@@ -1,4 +1,5 @@
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from shop.models import ProductModel, ProductStatus
 from cart.models import CartModel, CartItemModel
 
@@ -147,13 +148,12 @@ class CartSession:
             )
 
     def _validate_quantity(self, product_stock, cart_quantity, quantity, overide_quantity):
-        if overide_quantity:
-            if quantity < 0:
-                raise ValueError("Quantity cannot be negative")
-            elif quantity > product_stock:
-                raise ValueError("Quantity exceeds available stock")
-        else:
-            if quantity + cart_quantity < 0:
-                raise ValueError("Quantity cannot be negative")
-            elif quantity > 0 and quantity + cart_quantity > product_stock:
-                raise ValueError("Quantity exceeds available stock")
+        new_quantity = quantity + cart_quantity if not overide_quantity else quantity
+        if new_quantity < 0:
+            raise ValueError(_('موجودی کالا نمی تواند منفی باشد'))
+        elif new_quantity > product_stock and quantity > 0:
+            if product_stock == 0:
+                raise ValueError(_('موجودی کالای مورد نظر به پایان رسیده است'))
+            else:
+                raise ValueError(_('تعداد درخواستی بیشتر از تعداد موجود می باشد'))
+

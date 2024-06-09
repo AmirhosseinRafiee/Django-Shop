@@ -3,16 +3,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import F, Case, When, Value
+from django.db.models import F, Case, When
 from django.utils import timezone
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from order.models import UserAddressModel
-from cart.models import CartModel, CartItemModel
+from cart.models import CartModel
 from cart.cart import CartSession
-from payment.models import PaymentModel, PaymentClient
-from payment.clients import ZarinPalSandbox
 from shop.models import ProductModel
 from .permissions import HasCustomerAccessPermission
 from .models import OrderModel, OrderItemModel, CuponModel
@@ -32,6 +30,7 @@ class OrderCheckoutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
         context = super().get_context_data(**kwargs)
         context['addresses'] = UserAddressModel.objects.filter(
             user=self.request.user)
+        context['cart_obj'] = CartModel.objects.prefetch_related('cartitemmodel_set__product').get(user=self.request.user)
         return context
 
     def form_valid(self, form):
@@ -145,7 +144,7 @@ class OrderValidateCuponView(LoginRequiredMixin, HasCustomerAccessPermission, Vi
             if cupon_obj.used_by.all().count() >= cupon_obj.max_limit_usage:
                 message, status = _('تعداد کد تخفیف تمام شده است'), 403
 
-            elif cupon_obj.expiration_date > timezone.now():
+            elif cupon_obj.expiration_date and cupon_obj.expiration_date < timezone.now():
                 message, status = _('کد تخفیف منقصی شده'), 403
 
             elif request.user in cupon_obj.used_by.all():

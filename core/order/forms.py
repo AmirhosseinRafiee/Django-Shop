@@ -40,7 +40,7 @@ class CheckOutForm(forms.Form):
         if cupon_obj.used_by.all().count() >= cupon_obj.max_limit_usage:
             raise forms.ValidationError(_('تعداد کد تخفیف تمام شده است'))
 
-        elif cupon_obj.expiration_date > timezone.now():
+        elif cupon_obj.expiration_date and cupon_obj.expiration_date < timezone.now():
             raise forms.ValidationError(_('کد تخفیف منقصی شده است'))
 
         elif user in cupon_obj.used_by.all():

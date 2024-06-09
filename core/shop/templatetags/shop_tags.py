@@ -1,5 +1,5 @@
 from django import template
-from django.db.models import Exists, OuterRef
+from django.db.models import Q, OuterRef, Count, Exists
 from ..models import ProductModel, ProductStatus, WishlistProductModel
 
 register = template.Library()
@@ -25,10 +25,13 @@ def latest_products(context):
 def similar_products(context):
     request = context.get('request')
     product = context.get('object')
+    shared_category_count = Count('category', filter=Q(
+        category__in=product.category.all()))
     products = ProductModel.objects.filter(
         status=ProductStatus.publish.value,
-        category__in=product.category.all()
-    ).exclude(id=product.id).prefetch_related('category').order_by('-created_date').distinct()[:4]
+    ).exclude(id=product.id).annotate(
+        shared_category_count=shared_category_count
+    ).prefetch_related('category').order_by('-shared_category_count', '-created_date').distinct()[:4]
     if request.user.is_authenticated:
         wishlist_subquery = WishlistProductModel.objects.filter(
             user=request.user,

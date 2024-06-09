@@ -1,5 +1,4 @@
-{% extends 'base.html' %}
-{% load order_tags %}
+{% extends 'base-no-cart.html' %}
 
 {% block extra_css %}
 <style>
@@ -96,28 +95,8 @@
               <button class="btn btn-primary" onclick="validateCupon()" id="validateButton"> بررسی</button>
             </div>
 
-            <div class="border-bottom pb-4 mb-4">
-              <div class="d-grid gap-3">
-
-                <!-- End Row -->
-
-                <dl class="row">
-                  <dt class="col-sm-6">هزینه ارسال</dt>
-                  <dd class="col-sm-12 text-sm-end mb-0">برای تهران و حومه 35000 تومان</dd>
-                  <dd class="col-sm-12 text-sm-end mb-0">برای شهرستان ها 50000 تومان</dd>
-                </dl>
-                <!-- End Row -->
-              </div>
-            </div>
-            {% with cart_total_price=cart.get_cart_total_price %}
+            {% with cart_total_price=cart_obj.get_cart_total_price %}
             <div class="d-grid gap-3 mb-4" id="parent-price">
-              <dl class="row">
-                <dt class="col-sm-6">مالیات تخمینی</dt>
-                <dd class="col-sm-12 text-sm-end mb-0">با مالیات 9% -<span
-                    class="formatted-price">{{cart_total_price|get_tax}}</span></dd>
-
-              </dl>
-              <!-- End Row -->
 
               <dl class="row">
                 <dt class="col-sm-6">جمع کل</dt>
@@ -128,7 +107,7 @@
             </div>
             {% endwith %}
             <div class="d-grid">
-              <button class="btn btn-primary btn-lg" form="checkout-form" {% if cart|length == 0 %} disabled {% endif %}>ثبت نهایی</button>
+              <button class="btn btn-primary btn-lg" form="checkout-form" {% if cart_obj.cartitemmodel_set.count == 0 %} disabled {% endif %}>ثبت نهایی</button>
             </div>
 
           </div>
@@ -170,6 +149,7 @@
     $('#validateButton').prop('disabled', false);
     $('#delete-coupon').remove();
     $('#discount').remove();
+    $('#discounted-price').remove();
     $('#input-cupon').removeClass('readonly-input').prop('readonly', false).val("");
   }
 
@@ -206,6 +186,12 @@
         discountCode += addCommasToNumber(response.discount_amount) + ' تومان';
         discountCode += '</dd></dl>';
         $('#parent-price').append(discountCode);
+        let cartTotalPrice = parseFloat(totalPrice.data("cart-total-price"));
+        let discountedPrice = cartTotalPrice - response.discount_amount;
+        discountedPriceCode = '<dl class="row" id="discounted-price"><dt class="col-sm-6">قیمت با تخفیف</dt><dd class="col-sm-12 text-sm-end mb-0 formatted-price">';
+        discountedPriceCode += addCommasToNumber(discountedPrice) + ' تومان';
+        discountedPriceCode += '</dd></dl>';
+        $('#parent-price').append(discountedPriceCode);
       },
       error: function (jqXHR, textStatus, errorThrown) {
         var errorMessage = "مشکلی پیش آمده لحضاتی دیگر تلاش کنید";

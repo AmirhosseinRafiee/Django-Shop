@@ -4,7 +4,7 @@ from .models import ProductModel
 class ProductFilter(django_filters.FilterSet):
     q = django_filters.CharFilter(field_name='title', lookup_expr='icontains')
     price = django_filters.RangeFilter(field_name='discounted_price')
-    category = django_filters.CharFilter(field_name='category__title', lookup_expr='iexact')
+    category = django_filters.CharFilter(field_name='category__slug', lookup_expr='iexact')
 
     class Meta:
         model = ProductModel

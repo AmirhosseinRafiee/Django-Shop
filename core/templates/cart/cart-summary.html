@@ -37,7 +37,7 @@
                                             <span class="small">دسته بندی:</span>
                                             {% for category in object.product.category.all %}
                                             <a class="link-sm link-secondary fw-semibold small"
-                                                href="#">{{category.title}}</a>
+                                                href="{{category.get_absolute_url}}">{{category.title}}</a>
                                             {% if not forloop.last %}
                                             ,
                                             {% endif %}
@@ -142,12 +142,6 @@
 
                             <div class="d-grid gap-3 mb-4">
                                 <dl class="row">
-                                    <dt class="col-sm-6">مالیات</dt>
-                                    <dd class="col-sm-12 text-sm-end mb-0">به همراه 9% در هنگام پرداخت</dd>
-                                </dl>
-                                <!-- End Row -->
-
-                                <dl class="row">
                                     <dt class="col-sm-6">جمع</dt>
                                     <dd class="col-sm-12 text-sm-end mb-0 formatted-price" id="cart-total-price">{{cart_total_price}}
                                     </dd>
@@ -226,7 +220,7 @@
                     errorMessage = jqXHR.responseJSON.error;
                 } else {
                     // If no specific error message is returned, use a generic error message
-                    errorMessage = "An error occurred while processing your request.";
+                    errorMessage = "مشکلی پیش آمد دوباره تلاش کنید";
                 }
 
                 // Display the error message using Toastify

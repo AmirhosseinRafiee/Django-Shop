@@ -57,41 +57,68 @@
 </div>
 <!-- End Subscribe -->
 
-<!-- Clients -->
-<div class="container content-space-2">
-    <div class="row">
-        <div class="col text-center py-3">
-            <img class="avatar avatar-lg avatar-4x3" src="{% static 'svg/brands/hollister-dark.svg' %}" alt="Logo">
-        </div>
-        <!-- End Col -->
-
-        <div class="col text-center py-3">
-            <img class="avatar avatar-lg avatar-4x3" src="{% static 'svg/brands/levis-dark.svg' %}" alt="Logo">
-        </div>
-        <!-- End Col -->
-
-        <div class="col text-center py-3">
-            <img class="avatar avatar-lg avatar-4x3" src="{% static 'svg/brands/new-balance-dark.svg' %}" alt="Logo">
-        </div>
-        <!-- End Col -->
-
-        <div class="col text-center py-3">
-            <img class="avatar avatar-lg avatar-4x3" src="{% static 'svg/brands/puma-dark.svg' %}" alt="Logo">
-        </div>
-        <!-- End Col -->
-
-        <div class="col text-center py-3">
-            <img class="avatar avatar-lg avatar-4x3" src="{% static 'svg/brands/nike-dark.svg' %}" alt="Logo">
-        </div>
-        <!-- End Col -->
-
-        <div class="col text-center py-3">
-            <img class="avatar avatar-lg avatar-4x3" src="{% static 'svg/brands/tnf-dark.svg' %}" alt="Logo">
-        </div>
-        <!-- End Col -->
-    </div>
-    <!-- End Row -->
-</div>
-<!-- End Clients -->
-
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+    function subscribeNewsletter() {
+        emailInput = $('#subscribeForm')
+        email = emailInput.val();
+        if (!email) {
+            Toastify({
+                text: 'لطفاً ایمیل خود را پر کنید',
+                className: 'info',
+                close: true,
+                style: {
+                    background: 'blue'
+                }
+            }).showToast();
+            return;
+        }
+        if (!email.match(emailInput.attr('pattern'))) {
+            Toastify({
+                text: 'لطفاً یک آدرس ایمیل معتبر وارد کنید',
+                className: 'info',
+                close: true,
+                style: {
+                    background: 'blue'
+                }
+            }).showToast();
+            return;
+        }
+        $.ajax({
+            url: '{% url "ticket:newsletter-subscribe" %}',
+            method: 'POST',
+            data: {
+                email: $('#subscribeForm').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (response) {
+                Toastify({
+                    text: response.message,
+                    className: 'info',
+                    close: true,
+                    style: {
+                        background: 'blue'
+                    }
+                }).showToast();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // Extract the error message from the response text if available
+                var errorMessage = "مشکلی پیش آمده لحضاتی دیگر تلاش کنید";
+                if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                    errorMessage = jqXHR.responseJSON.error;
+                }
+                Toastify({
+                    text: errorMessage,
+                    className: 'error',
+                    close: true,
+                    style: {
+                        background: 'red'
+                    }
+                }).showToast();
+            }
+        });
+    }
+</script>
+{% endblock %}

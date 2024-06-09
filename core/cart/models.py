@@ -12,6 +12,12 @@ class CartModel(models.Model):
     def __str__(self):
         return self.user.email
 
+    def get_cart_total_price(self):
+        total = 0
+        for item in self.cartitemmodel_set.all():
+            total += item.product.get_price() * item.quantity
+        return total
+
 class CartItemModel(models.Model):
     cart = models.ForeignKey(CartModel,on_delete=models.CASCADE)
     product = models.ForeignKey('shop.ProductModel',on_delete=models.PROTECT)

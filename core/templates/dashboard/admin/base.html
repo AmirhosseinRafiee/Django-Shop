@@ -73,7 +73,7 @@
 
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.view_name  == 'website:contact' %} active {% endif %}"
-                                href="#">ارتباط با ما</a>
+                                href="{% url 'ticket:contact' %}">ارتباط با ما</a>
                         </li>
 
                         <li class="nav-item">
@@ -134,8 +134,12 @@
                     <!-- End Col -->
 
                     <div class="col-auto">
+
                         <div class="d-none d-lg-block">
-                            <a class="btn btn-soft-light btn-sm" href="{% url 'accounts:logout' %}">خروج</a>
+                            <form action="{% url 'accounts:logout' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-soft-light btn-sm">خروج</button>
+                            </form>
                         </div>
                         <!-- Responsive Toggle Button -->
                         <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse"
@@ -411,14 +415,14 @@
 
                     <div class="mb-7">
                         <!-- Form -->
-                        <form>
+                        <form action="{% url 'shop:product-grid' %}" method="get">
                             <!-- Input Card -->
                             <div class="input-card">
                                 <div class="input-card-form">
                                     <input type="text" class="form-control form-control-lg" placeholder="جستجو محصولات"
-                                        aria-label="جستجو محصولات">
+                                        aria-label="جستجو محصولات" name="q">
                                 </div>
-                                <button type="button" class="btn btn-primary btn-lg">جستجو کردن</button>
+                                <button type="submit" class="btn btn-primary btn-lg">جستجو کردن</button>
                             </div>
                             <!-- End Input Card -->
                         </form>

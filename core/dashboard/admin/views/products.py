@@ -41,7 +41,7 @@ class AdminProductCreateView(LoginRequiredMixin, AdminAccessPermission, SuccessM
 
 class AdminProductEditView(LoginRequiredMixin, AdminAccessPermission, SuccessMessageMixin, UpdateView):
     template_name = 'dashboard/admin/product/product-edit.html'
-    queryset = ProductModel.objects.all().prefetch_related('productimagemodel_set')
+    queryset = ProductModel.objects.all().prefetch_related('productimagemodel_set', 'category')
     form_class = AdminProductForm
     extra_context = {'categories': ProductCategoryModel.objects.all()}
     success_url = reverse_lazy('dashboard:admin:product-list')
@@ -51,6 +51,7 @@ class AdminProductEditView(LoginRequiredMixin, AdminAccessPermission, SuccessMes
         initial = super().get_initial()
         initial['extra_images'] = self.object.productimagemodel_set.all()
         return initial
+
 
 class AdminProductDeleteView(LoginRequiredMixin, AdminAccessPermission, SuccessMessageMixin, DeleteView):
     template_name = 'dashboard/admin/product/product-delete.html'
@@ -71,6 +72,7 @@ class CkeditorUploadFile(LoginRequiredMixin, AdminAccessPermission, View):
             url = handle_uploaded_file(request.FILES["upload"])
             return JsonResponse({"url": url})
         return JsonResponse({"error": form.errors.get_json_data()})
+
 
 class AdminDeleteExtraImage(LoginRequiredMixin, AdminAccessPermission, View):
 

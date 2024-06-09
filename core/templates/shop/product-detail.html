@@ -84,7 +84,7 @@
         <!-- End Rating -->
         {% if request.user.is_authenticated %}
         <button type="button"
-          class="btn btn-outline-secondary btn-xs btn-icon rounded-circle {% if object.in_wishlist %} active {% endif %}"
+          class="btn btn-outline-primary btn-xs btn-icon rounded-circle {% if object.in_wishlist %} active {% endif %}"
           data-bs-toggle="tooltip" data-bs-placement="top" onclick="toggleWishlist(this, `{{object.id}}`)">
           <i class="bi-heart"></i>
         </button>
@@ -655,8 +655,7 @@
       addToCartButton.style.display = 'none';
       var buttonPlus = document.getElementById("plus-button");
       var MaximumAlertSpan = document.getElementById("maximum-alert");
-      if (quantity === {{ object.stock }
-    }) {
+      if (quantity === {{ object.stock }}) {
       buttonPlus.disabled = true;
       MaximumAlertSpan.textContent = '(حداکثر)';
     } else {

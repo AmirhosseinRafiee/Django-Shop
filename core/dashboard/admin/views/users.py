@@ -1,5 +1,3 @@
-from typing import Any
-from django.db.models.query import QuerySet
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import get_user_model

@@ -88,11 +88,7 @@
               {% url 'cart:session-cart-summary' as cart_summary_url %}
               <!-- Shopping Cart -->
               <button class="btn btn-ghost-secondary btn-icon" type="button" data-bs-toggle="offcanvas"
-                data-bs-target="#offcanvasNavbarShoppingCart" aria-controls="offcanvasNavbarShoppingCart"
-                  {% if request.path == cart_summary_url %}
-                  disabled
-                  {% endif %}
-                >
+                data-bs-target="#offcanvasNavbarShoppingCart" aria-controls="offcanvasNavbarShoppingCart" {% if request.path == cart_summary_url %} disabled {% endif %}>
                 <i class="bi-basket"></i>
                 <span class="cart-item-count">{{cart|length}}</span>
               </button>
@@ -144,8 +140,6 @@
               <img class="brand" src="{% static 'svg/logos/logo.svg' %}" alt="Logo">
             </a>
             <!-- End Logo -->
-
-            <p class="text-muted small mb-0">&copy; Maryam Farajian 2023 Front RTL</p>
           </div>
         </div>
 
@@ -157,7 +151,6 @@
             <li><a class="link-sm text-secondary" href="#">سفارش دادن</a></li>
             <li><a class="link-sm text-secondary" href="#">گزینه های حمل و نقل</a></li>
             <li><a class="link-sm text-secondary" href="#">پیگیری یک بسته</a></li>
-            <li><a class="link-sm text-secondary" href="#">در دسترس بودن کشور</a></li>
           </ul>
           <!-- End List -->
         </div>
@@ -311,14 +304,14 @@
 
           <div class="mb-7">
             <!-- Form -->
-            <form>
+            <form action="{% url 'shop:product-grid' %}" method="get">
               <!-- Input Card -->
               <div class="input-card">
                 <div class="input-card-form">
                   <input type="text" class="form-control form-control-lg" placeholder="جستجو محصولات"
-                    aria-label="جستجو محصولات">
+                    aria-label="جستجو محصولات" name="q">
                 </div>
-                <button type="button" class="btn btn-primary btn-lg">جستجو کردن</button>
+                <button type="submit" class="btn btn-primary btn-lg">جستجو کردن</button>
               </div>
               <!-- End Input Card -->
             </form>
@@ -537,7 +530,7 @@
               errorMessage = jqXHR.responseJSON.error;
             } else {
               // If no specific error message is returned, use a generic error message
-              errorMessage = "An error occurred while processing your request.";
+              errorMessage = "مشکلی پیش آمد دوباره تلاش کنید";
             }
 
             Toastify({
@@ -572,7 +565,7 @@
             errorMessage = jqXHR.responseJSON.message;
           } else {
             // If no specific error message is returned, use a generic error message
-            errorMessage = "An error occurred while processing your request.";
+            errorMessage = "مشکلی پیش آمد دوباره تلاش کنید";
           }
           Toastify({
             text: errorMessage,

@@ -20,7 +20,7 @@
 
                     <div class="card-pinned-top-end">
                         {% if request.user.is_authenticated %}
-                        <button type="button" class="btn btn-outline-secondary btn-xs btn-icon rounded-circle
+                        <button type="button" class="btn btn-outline-primary btn-xs btn-icon rounded-circle
                             {% if product.in_wishlist %} active {% endif %}" data-bs-toggle="tooltip"
                             data-bs-placement="top" onclick="toggleWishlist(this, `{{product.id}}`)">
                             <i class="bi-heart"></i>
@@ -32,7 +32,7 @@
                 <div class="card-body">
                     <div class="mb-1">
                         {% for category in product.category.all %}
-                        <a class="link-sm link-secondary" href="#">{{category.title}}</a>
+                        <a class="link-sm link-secondary" href="{{category.get_absolute_url}}">{{category.title}}</a>
                         {% if not forloop.last %}
                         ,
                         {% endif %}

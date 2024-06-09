@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.utils import IntegrityError
 from django.db.models import Avg
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 from decimal import Decimal
@@ -26,6 +27,9 @@ class ProductCategoryModel(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('shop:product-grid') + f'?category={self.slug}'
 
 class ProductModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)

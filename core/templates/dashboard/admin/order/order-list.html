@@ -1,5 +1,35 @@
 {% extends 'dashboard/admin/base.html' %}
 
+{% block extra_css %}
+<style>
+    .badge-pending {
+        --bs-bg-opacity: 1;
+        background-color: rgba(255, 140, 0, var(--bs-bg-opacity)) !important;
+    }
+
+    .badge-processing {
+        --bs-bg-opacity: 1;
+        background-color: rgba(218, 165, 32, var(--bs-bg-opacity)) !important;
+    }
+
+    .badge-shipped {
+        --bs-bg-opacity: 1;
+        background-color: rgba(70, 130, 180, var(--bs-bg-opacity)) !important;
+    }
+
+    .badge-delivered {
+        --bs-bg-opacity: 1;
+        background-color: rgba(34, 139, 34, var(--bs-bg-opacity)) !important;
+    }
+
+    .badge-canceled {
+        --bs-bg-opacity: 1;
+        background-color: rgba(178, 34, 34, var(--bs-bg-opacity)) !important;
+    }
+
+</style>
+{% endblock %}
+
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb breadcrumb-light mb-0">
@@ -86,7 +116,7 @@
                             <td>{{object.user.profile.full_name}}</td>
                             <td class="formatted-price">{{object.total_price}}</td>
                             <td>{{object.created_date|date:"Y/m/d"}}</td>
-                            <td>{{object.get_status.label}}</td>
+                            <td><span class="badge badge-{{object.get_status.title}}">{{object.get_status.label}}</span></td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -144,7 +174,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- jQuery Script -->
 <script>
     $(document).ready(function () {
         let current_url_params = new URLSearchParams(window.location.search)

@@ -37,7 +37,7 @@
     {% if form.non_field_errors %}
     <script>
         Toastify({
-            text: `{{ form.non_field_errors.as_text }}`,
+            text: `{{ field.name }} - {{ form.non_field_errors.as_text }}`,
             className: `error`,
             close: true,
             style: {
