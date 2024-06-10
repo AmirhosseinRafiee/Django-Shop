@@ -1,0 +1,65 @@
+{% load static %}
+
+<!-- Hero -->
+<div class="position-relative">
+    <!-- Swiper Main Slider -->
+    <div class="js-swiper-shop-classic-hero swiper bg-light">
+      <div class="swiper-wrapper">
+        {% for featured_product in featured_products %}
+        <!-- Slide -->
+        <div class="swiper-slide">
+          <!-- Container -->
+          <div class="container content-space-t-2 content-space-b-3">
+            <div class="row align-items-lg-center">
+              <div class="col-lg-5 order-lg-2 mb-7 mb-lg-0">
+                <div class="mb-6">
+                  <h1 class="display-4 mb-4">{{featured_product.product.title}}</h1>
+                  <p>{{featured_product.product.brief_description}}</p>
+                </div>
+
+                <div class="d-flex gap-2">
+                  <a class="btn btn-primary rounded-pill" href="{% url 'shop:product-detail' slug=featured_product.product.slug %}">نمایش جزئیات محصول</a>
+                </div>
+              </div>
+              <!-- End Col -->
+
+              <div class="col-lg-6 order-lg-1">
+                <div class="w-75 mx-auto">
+                  <img class="img-fluid" src="{{featured_product.product.image.url}}" alt="Image Description">
+                </div>
+              </div>
+              <!-- End Col -->
+            </div>
+            <!-- End Row -->
+          </div>
+          <!-- End Container -->
+        </div>
+        <!-- End Slide -->
+        {% endfor %}
+      </div>
+
+      <!-- Arrows -->
+      <div class="js-swiper-shop-classic-hero-button-prev swiper-button-prev"></div>
+      <div class="js-swiper-shop-classic-hero-button-next swiper-button-next"></div>
+    </div>
+    <!-- End Swiper Main Slider -->
+
+    <!-- Swiper Thumbs Slider -->
+    <div class="position-absolute bottom-0 start-0 end-0 mb-3">
+      <div class="js-swiper-shop-hero-thumbs swiper" style="max-width: 13rem;">
+        <div class="swiper-wrapper">
+            {% for featured_product in featured_products %}
+          <!-- Slide -->
+          <div class="swiper-slide">
+            <a class="js-swiper-thumb-progress swiper-thumb-progress-avatar" href="javascript:;" tabindex="0">
+              <img class="swiper-thumb-progress-avatar-img" src="{{featured_product.product.image.url}}" alt="Image Description">
+            </a>
+          </div>
+          <!-- End Slide -->
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <!-- End Swiper Thumbs Slider -->
+  </div>
+  <!-- End Hero -->

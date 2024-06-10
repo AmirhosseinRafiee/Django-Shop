@@ -1,6 +1,6 @@
 from django import template
 from django.db.models import Q, OuterRef, Count, Exists
-from ..models import ProductModel, ProductStatus, WishlistProductModel
+from ..models import ProductModel, ProductStatus, WishlistProductModel, FeaturedProductModel
 
 register = template.Library()
 
@@ -41,3 +41,10 @@ def similar_products(context):
             in_wishlist=Exists(wishlist_subquery)
         )
     return {'similar_products': products, 'request': request}
+
+
+@register.inclusion_tag('includes/featured-products.html')
+def featured_products():
+    featured_products = FeaturedProductModel.objects.select_related(
+        'product').filter(product__status=ProductStatus.publish.value)
+    return {'featured_products': featured_products}

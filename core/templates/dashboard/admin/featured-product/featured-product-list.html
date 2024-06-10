@@ -1,0 +1,93 @@
+{% extends 'dashboard/admin/base.html' %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-light mb-0">
+        <li class="breadcrumb-item">حساب</li>
+        <li class="breadcrumb-item">داشبورد ادمین</li>
+        <li class="breadcrumb-item active" aria-current="page">
+            محصولات ویژه
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<!-- Card -->
+<div class="card">
+    <!-- Header -->
+    <div class="card-header border-bottom">
+        <h5 class="">لیست محصولات ویژه</h5>
+    </div>
+    <!-- End Header -->
+
+    <!-- Body -->
+    <div class="card-body">
+
+        <div class="row">
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table">
+                    <thead class="thead-light text-center">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">نام محصول</th>
+                            <th scope="col">دسته بندی</th>
+                            <th scope="col">قیمت</th>
+                            <th scope="col">تعداد</th>
+                            <th scope="col">وضعیت</th>
+                            <th scope="col">تخفیف</th>
+                            <th scope="col">عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for object in object_list %}
+                        <tr>
+                            <th scope="row">{{object.product.id}}</th>
+                            <td>{{object.product.title}}</td>
+                            <td>{% for category in object.product.category.all %}{{category.title}}{% if not forloop.last %},
+                                {% endif %}{% endfor %}</td>
+                            <td>{{object.product.price}}</td>
+                            <td>{{object.product.stock}}</td>
+                            <td>{% if object.product.is_published %}<span class="badge bg-success">نشر شده</span>
+                                {% else %}<span class="badge bg-danger">عدم انتشار</span>
+                                {% endif %}
+                            </td>
+                            <td>%{{object.product.discount_percent}}</td>
+                            <td>
+                                <div class="d-flex align-items-center mb-0">
+                                    <form action="{% url 'dashboard:admin:featured-product-delete' pk=object.pk %}"
+                                        method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-icon btn-ghost-danger">
+                                            <i class="bi-trash me-1"></i>
+                                        </button>
+                                    </form>
+                                    <a class="btn btn-sm btn-icon btn-ghost-primary"
+                                        href="{% url 'shop:product-detail' slug=object.product.slug %}">
+                                        <i class="bi-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- End Table -->
+            <div class="row m-1 py-0 ">
+                <div class="d-flex justify-content-start">
+                    <div>
+                        {{ object_list|length }} محصول
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- End Row -->
+
+    </div>
+    <!-- End Body -->
+</div>
+<!-- End Card -->
+{% endblock %}

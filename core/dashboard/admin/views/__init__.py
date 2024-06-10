@@ -1,6 +1,7 @@
 from .generals import *
 from .profiles import *
 from .products import *
+from .featured_product import *
 from .coupon import *
 from .users import *
 from .orders import *

@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django_ckeditor_5.views import UploadFileForm, NoImageException, image_verify, handle_uploaded_file
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
-from shop.models import ProductModel, ProductCategoryModel, ProductImageModel
+from shop.models import ProductModel, ProductCategoryModel, ProductImageModel, FeaturedProductModel
 from ..forms import AdminProductForm
 from ..filters import AdminProductFilter
 from ...permissions import AdminAccessPermission
@@ -13,7 +13,7 @@ from ...permissions import AdminAccessPermission
 
 class AdminProductListView(LoginRequiredMixin, AdminAccessPermission, ListView):
     template_name = 'dashboard/admin/product/product-list.html'
-    queryset = ProductModel.objects.all()
+    queryset = ProductModel.objects.all().prefetch_related('category')
     extra_context = {'categories': ProductCategoryModel.objects.all()}
     paginate_by = 10
 
@@ -21,7 +21,7 @@ class AdminProductListView(LoginRequiredMixin, AdminAccessPermission, ListView):
         return self.request.GET.get('page_size', self.paginate_by)
 
     def get_queryset(self):
-        qs = super().get_queryset().prefetch_related('category')
+        qs = super().get_queryset()
         return AdminProductFilter(self.request.GET, qs).qs
 
 
@@ -41,7 +41,8 @@ class AdminProductCreateView(LoginRequiredMixin, AdminAccessPermission, SuccessM
 
 class AdminProductEditView(LoginRequiredMixin, AdminAccessPermission, SuccessMessageMixin, UpdateView):
     template_name = 'dashboard/admin/product/product-edit.html'
-    queryset = ProductModel.objects.all().prefetch_related('productimagemodel_set', 'category')
+    queryset = ProductModel.objects.all().prefetch_related(
+        'productimagemodel_set', 'category')
     form_class = AdminProductForm
     extra_context = {'categories': ProductCategoryModel.objects.all()}
     success_url = reverse_lazy('dashboard:admin:product-list')
