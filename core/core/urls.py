@@ -34,10 +34,12 @@ urlpatterns = [
     path("ckeditor5/", CkeditorUploadFile.as_view() , name="ck_editor_5_upload_file"),
 ]
 
+handler404 = 'website.views.error_404'
+handler500 = 'website.views.error_500'
+
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.SHOW_DEBUGGER_TOOLBAR:
     urlpatterns += [path('__debug__/', include('debug_toolbar.urls')),]
-
