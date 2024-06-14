@@ -208,10 +208,15 @@
                 {% endif %}
               </a>
               <!-- End Rating -->
-
+              {% if not object.zero_stock %}
               <button type="button" class="btn btn-outline-primary btn-sm btn-transition rounded-pill"
                 onclick="addToCart(`{{object.id}}`)">افزودن به سبد
                 خرید</button>
+              {% else %}
+              <div class="card-pinned-top-start">
+                <span class="badge bg-danger rounded-pill">اتمام موجودی</span>
+              </div>
+              {% endif %}
             </div>
           </div>
           <!-- End Card -->

@@ -16,12 +16,12 @@ class CartSession:
         self.session.modified = True
 
     def add(self, product_id, product_stock, quantity=1, overide_quantity=False):
+        self._validate_quantity(product_stock, self.get_product_quantity(product_id),
+                                quantity, overide_quantity)
         if product_id not in self.cart:
             self.cart[product_id] = {
                 "quantity": 0,
             }
-        self._validate_quantity(product_stock, self.cart[product_id]['quantity'],
-                                quantity, overide_quantity)
         if overide_quantity:
             self.cart[product_id]["quantity"] = quantity
         else:

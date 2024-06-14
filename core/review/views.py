@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from shop.models import ProductStatus
 from .models import ReviewProductModel
 from .forms import ReviewProductForm
 
@@ -16,7 +17,7 @@ class ReviewProductSubmitView(LoginRequiredMixin, SuccessMessageMixin, CreateVie
         product = form.instance.product
 
         # Check if the product is published
-        if product.status != 'published':
+        if product.status != ProductStatus.publish.value:
             messages.error(self.request, _('یک محصول معتبر را انتخاب کنید. این محصول یکی از انتخاب‌های موجود نیست'))
             return redirect(self.request.META.get('HTTP_REFERER'))
 

@@ -17,6 +17,9 @@ class ProductFilter(django_filters.FilterSet):
         if ordering is not None:
             queryset = queryset.order_by(ordering)
 
+        # Ensure products with zero stock are at the end
+        queryset = queryset.order_by('zero_stock', *queryset.query.order_by)
+
         return queryset
 
     def _get_ordering(self):

@@ -1,7 +1,7 @@
 from django.db.models.base import Model as Model
 from django.views.generic import View, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import F, ExpressionWrapper, IntegerField, Value, Count, Case, When, IntegerField, Exists, OuterRef, Prefetch, Subquery
+from django.db.models import F, ExpressionWrapper, IntegerField, Value, Count, Case, When, IntegerField, Exists, OuterRef, Prefetch, Subquery, BooleanField
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -25,6 +25,15 @@ class ShopProductGridView(ListView):
         )
         qs = qs.annotate(
             discounted_price=discounted_price_expression
+        )
+
+        # Annotate whether the product has zero stock
+        qs = qs.annotate(
+            zero_stock=Case(
+                When(stock=0, then=True),
+                default=False,
+                output_field=BooleanField()
+            )
         )
 
         if self.request.user.is_authenticated:
@@ -111,27 +120,28 @@ class ShopProductDetailView(IsAdminOrPublishedPermission, DetailView):
         )
 
         if self.request.user.is_authenticated:
-            wishlist_subquery = WishlistProductModel.objects.filter(
+            wishlist_subquery=WishlistProductModel.objects.filter(
                 user=self.request.user,
                 product=OuterRef('pk')
             )
-            qs = qs.annotate(
+            qs=qs.annotate(
                 in_wishlist=Exists(wishlist_subquery)
             )
+
         return qs
 
 
 class WishlistToggleView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
-        product_id = request.POST.get('product_id')
-        product = get_object_or_404(ProductModel, id=product_id)
-        wishlist, created = WishlistProductModel.objects.get_or_create(
+        product_id=request.POST.get('product_id')
+        product=get_object_or_404(ProductModel, id=product_id)
+        wishlist, created=WishlistProductModel.objects.get_or_create(
             user=self.request.user, product=product)
         if not created:
             wishlist.delete()
-            status, message = 204, _('محصول با موفقیت از لیست علایق حذف شد')
+            status, message=204, _('محصول با موفقیت از لیست علایق حذف شد')
         else:
-            status, message = 201, _('محصول با موفقیت به لیست علایق اضافه شد')
+            status, message=201, _('محصول با موفقیت به لیست علایق اضافه شد')
 
         return JsonResponse({'message': message}, status=status)
