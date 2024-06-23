@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config(
-    'SECRET_KRY', default='django-insecure-@t*7y&_uv!=@-440@s-)1cm_f97l1=bd+wc7vgg)_1)t43x$2^')
+    'SECRET_KEY', default='django-insecure-@t*7y&_uv!=@-440@s-)1cm_f97l1=bd+wc7vgg)_1)t43x$2^')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool, default=True)
@@ -98,7 +98,7 @@ DATABASES = {
         'USER': config('PGDB_USER', default='postgres'),
         'PASSWORD': config('PGDB_PASSWORD', default='postgres'),
         'HOST': config('PGDB_HOST', default='db'),
-        'PORT': config('PGDB_NAMEPORT', cast=int, default=5432),
+        'PORT': config('PGDB_PORT', cast=int, default=5432),
     }
 }
 
@@ -153,7 +153,7 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # sites configs
-SITE_ID = 1
+SITE_ID = config('SITE_ID', cast=int, default=1)
 
 # Email configuratuins
 EMAIL_BACKEND = config(
@@ -164,11 +164,12 @@ EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool, default=False)
 EMAIL_PORT = config('EMAIL_PORT', cast=int, default=1025)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='admin@example.com')
 
 # django debug toolbar for docker usage
 SHOW_DEBUGGER_TOOLBAR = config(
     "SHOW_DEBUGGER_TOOLBAR", cast=bool, default=True)
-if SHOW_DEBUGGER_TOOLBAR:
+if SHOW_DEBUGGER_TOOLBAR and DEBUG:
     INSTALLED_APPS += [
         "debug_toolbar",
     ]
@@ -284,5 +285,19 @@ CKEDITOR_5_CONFIGS = {
 
 # payment configs
 ZARINPAL_MERCHANT_ID = config('ZARINPAL_SANDBOX_MERCHANT_ID', default="1344b5d4-0048-11e8-9aab-005056a205be")
-AQAYEPARDAKHT_PIN = config('ZARINPAL_SANDBOX_PIN', default="sandbox")
+AQAYEPARDAKHT_PIN = config('AQAYEPARDAKHT_PIN', default="sandbox")
 PAYPING_TOKEN = config('PAYPING_TOKEN', default="Rfus2gd7n2Em6o8iPhx583-2Bo8g_srkQmxdF2VrLXw")
+
+# security configs
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000 # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'

@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 from dashboard.admin.views import CkeditorUploadFile
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('adminpage/', admin.site.urls),
     path('', include('website.urls')),
     path('', include('ticket.urls')),
     path('dashboard/', include('dashboard.urls')),

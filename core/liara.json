@@ -1,0 +1,22 @@
+{
+    "platform": "django",
+    "django": {
+      "pythonVersion": "3.9",
+      "collectStatic": true,
+      "compileMessages": false,
+      "modifySettings": true,
+      "timezone": "Asia/Tehran"
+
+    },
+    "app": "amirhosseinrafiee",
+    "disks": [
+      {
+        "name": "static",
+        "mountTo": "/usr/src/app/staticfiles/"
+      },
+      {
+        "name": "media",
+        "mountTo": "/usr/src/app/media/"
+      }
+    ]
+  }
